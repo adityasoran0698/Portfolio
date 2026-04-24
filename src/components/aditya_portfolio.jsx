@@ -2553,7 +2553,7 @@ const PROJECTS = [
     accentColor: "#34D399",
     tags: ["Full Stack", "AI", "NLP"],
     stack: "MERN · FastAPI · NLP · Sentiment Analysis · JWT",
-    desc: "Full-stack Ayurveda therapy booking platform with role-based access, auto-scheduling, and AI-powered 3-class sentiment NLP — built for Ministry of AYUSH.",
+    desc: "Full-stack Ayurveda therapy booking platform with role-based access, automated scheduling, and AI-powered sentiment analysis classifying feedback as positive, neutral, or negative.",
     live: "https://ayur-sutra-coral.vercel.app/",
     github: "https://github.com/adityasoran0698",
     status: "Live",
