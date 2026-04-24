@@ -2566,8 +2566,8 @@ const PROJECTS = [
     stack:
       "Python · LangChain · gpt-4o-mini · OpenAI Embeddings · FastAPI · React",
     desc: "AI Medical Research Assistant that queries PubMed, OpenAlex & ClinicalTrials.gov in parallel, ranks 50–300 results using OpenAI embeddings, and delivers source-backed answers via gpt model with multi-turn memory.",
-    live: "https://lnkd.in/g2h6q9H7",
-    github: "https://lnkd.in/gvvEdcNq",
+    live: "https://deployed-curalink.vercel.app/",
+    github: "https://github.com/adityasoran0698/CuraLink",
     status: "Live",
   },
   {
