@@ -1,221 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import backgroundImage from "./image.png";
 import MyCV from "./CV.pdf";
-import AyurImage from "./ayur.png";
-import YoutubeImage from "./Youtube.png";
 
-/* ─────────────────────────────────────────────
-   ABOUT SECTION — inject keyframes once
-───────────────────────────────────────────── */
-const ABOUT_STYLE_ID = "about-section-keyframes";
-if (
-  typeof document !== "undefined" &&
-  !document.getElementById(ABOUT_STYLE_ID)
-) {
-  const s = document.createElement("style");
-  s.id = ABOUT_STYLE_ID;
-  s.textContent = `
-    @keyframes ab-fadeUp   { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes ab-fadeRight{ from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
-    @keyframes ab-fadeLeft { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
-    @keyframes ab-lineGrow { from{transform:scaleX(0)} to{transform:scaleX(1)} }
-    @keyframes ab-chipIn   { from{opacity:0;transform:translateY(10px) scale(.9)} to{opacity:1;transform:translateY(0) scale(1)} }
-    @keyframes ab-shimmer  { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
-    @keyframes ab-pulseDot { 0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} }
-    @keyframes ab-glowFloat{ 0%,100%{transform:translateY(0) scale(1);opacity:.6} 50%{transform:translateY(-18px) scale(1.04);opacity:.9} }
-    @keyframes ab-orbDrift { 0%,100%{transform:translate(0,0)} 33%{transform:translate(30px,-20px)} 66%{transform:translate(-20px,25px)} }
-
-
-    .ab-section .ab-reveal        { opacity:0; transform:translateY(24px); transition:opacity .65s cubic-bezier(.22,1,.36,1), transform .65s cubic-bezier(.22,1,.36,1); }
-    .ab-section .ab-reveal.ab-vis { opacity:1; transform:translateY(0); }
-
-    .ab-card::after {
-      content:''; position:absolute; top:0; left:0; right:0; height:2px;
-      background:linear-gradient(90deg,#f26522,transparent);
-      transform:scaleX(0); transform-origin:left;
-      transition:transform .45s cubic-bezier(.22,1,.36,1);
-    }
-    .ab-card:hover::after { transform:scaleX(1); }
-    .ab-card::before {
-      content:''; position:absolute; top:-60%; left:-60%; width:60%; height:200%;
-      background:linear-gradient(120deg,transparent,rgba(242,101,34,.07),transparent);
-      transform:skewX(-20deg) translateX(-100%);
-      transition:transform .55s ease; pointer-events:none;
-    }
-    .ab-card:hover::before { transform:skewX(-20deg) translateX(360%); }
-    .ab-card:hover         { background:rgba(242,101,34,.04) !important; }
-    .ab-card:hover .ab-card-num   { color:rgba(242,101,34,.6); }
-    .ab-card:hover .ab-card-title { color:#fff; }
-    .ab-card:hover .ab-card-body  { color:#906050; }
-    .ab-card:hover .ab-card-icon  {
-      border-color:rgba(242,101,34,.55);
-      transform:rotate(-4deg) scale(1.08);
-      box-shadow:0 0 16px rgba(242,101,34,.18);
-    }
-
-    .ab-trait::before {
-      content:''; position:absolute; left:0; top:0; bottom:0; width:2px;
-      background:#f26522; transform:scaleY(0);
-      transition:transform .35s cubic-bezier(.22,1,.36,1);
-    }
-    .ab-trait:hover::before  { transform:scaleY(1); }
-    .ab-trait:hover          { background:rgba(242,101,34,.025) !important; }
-    .ab-trait:hover .ab-trait-title { color:#fff; }
-    .ab-trait:hover .ab-trait-body  { color:#806050; }
-    .ab-trait:hover .ab-trait-icon  {
-      border-color:#f26522;
-      background:rgba(242,101,34,.1);
-      transform:scale(1.1);
-    }
-
-    .ab-chip-inner::before {
-      content:''; position:absolute; inset:0;
-      background:#f26522; transform:scaleX(0); transform-origin:left;
-      transition:transform .28s ease; z-index:-1;
-    }
-    .ab-chip-inner:hover { color:#160b00 !important; border-color:#f26522 !important; transform:translateY(-2px); }
-    .ab-chip-inner:hover::before { transform:scaleX(1); }
-
-    .ab-divider::after {
-      content:''; position:absolute; top:0; left:-40%; width:30%; height:100%;
-      background:linear-gradient(90deg,transparent,rgba(242,101,34,.55),transparent);
-      animation:ab-shimmer 3s linear infinite;
-    }
-
-    .ab-badge::after {
-      content:''; position:absolute; inset:0;
-      background:linear-gradient(90deg,transparent 0%,rgba(242,101,34,.08) 50%,transparent 100%);
-      background-size:300% 100%; opacity:0;
-      transition:opacity .3s; animation:ab-shimmer 2.5s linear infinite;
-    }
-    .ab-badge:hover { border-color:rgba(242,101,34,.5) !important; background:rgba(242,101,34,.09) !important; }
-    .ab-badge:hover::after { opacity:1; }
-
-    .ab-quote::after {
-      content:''; position:absolute; bottom:0; left:20px; right:0;
-      height:1px; background:linear-gradient(90deg,#f26522,transparent);
-      transform:scaleX(0); transform-origin:left;
-      transition:transform .5s ease;
-    }
-    .ab-left-col:hover .ab-quote::after { transform:scaleX(1); }
-  `;
-  document.head.appendChild(s);
-}
-
-/* ─────────────────────────────────────────────
-   ABOUT SECTION — local SVG icons
-───────────────────────────────────────────── */
-const AbIconChat = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-  </svg>
-);
-const AbIconMonitor = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="2" y="3" width="20" height="14" rx="2" />
-    <line x1="8" y1="21" x2="16" y2="21" />
-    <line x1="12" y1="17" x2="12" y2="21" />
-  </svg>
-);
-const AbIconSearch = () => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="11" cy="11" r="8" />
-    <path d="m21 21-4.35-4.35" />
-  </svg>
-);
-const AbIconShield = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-  </svg>
-);
-const AbIconInfo = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-    <path d="M12 8v4M12 16h.01" />
-  </svg>
-);
-const AbIconUsers = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-const AbIconActivity = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-  </svg>
-);
-
-/* ─────────────────────────────────────────────
-   GLOBAL STYLES
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   GLOBAL CSS
+═══════════════════════════════════════════════════════════════════════════ */
 const GLOBAL_CSS = `
-  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Outfit:wght@400;600;700;800;900&display=swap');
+
   *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
   body { background:#160b00; overflow-x:hidden; }
@@ -223,111 +15,97 @@ const GLOBAL_CSS = `
   ::-webkit-scrollbar-track { background:#160b00; }
   ::-webkit-scrollbar-thumb { background:#f26522; border-radius:3px; }
 
-  @keyframes floatY {
-    0%,100% { transform: translateY(0px) rotate(var(--rot,0deg)); }
-    50%      { transform: translateY(-18px) rotate(var(--rot,0deg)); }
+  @keyframes floatY       { 0%,100%{transform:translateY(0) rotate(var(--rot,0deg))} 50%{transform:translateY(-18px) rotate(var(--rot,0deg))} }
+  @keyframes floatSlow    { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+  @keyframes spinRing     { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes spinRingRev  { from{transform:rotate(0deg)} to{transform:rotate(-360deg)} }
+  @keyframes fadeUp       { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes pulseGlow    { 0%,100%{box-shadow:0 8px 30px rgba(242,101,34,.4)} 50%{box-shadow:0 8px 55px rgba(242,101,34,.75)} }
+  @keyframes loadFadeIn   { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes netflixBgFade    { 0%{opacity:1} 80%{opacity:1} 100%{opacity:0} }
+  @keyframes netflixLetterZoom{ 0%{transform:scale(.7);opacity:0} 12%{transform:scale(.85);opacity:1} 70%{transform:scale(7);opacity:1} 88%{transform:scale(12);opacity:0} 100%{transform:scale(14);opacity:0} }
+  @keyframes netflixSoundWave { 0%,100%{height:4px} 50%{height:20px} }
+  @keyframes netflixGlow      { 0%{text-shadow:0 0 20px rgba(242,101,34,.3)} 40%{text-shadow:0 0 60px rgba(242,101,34,.9),0 0 120px rgba(242,101,34,.5)} 70%{text-shadow:0 0 100px rgba(242,101,34,1),0 0 200px rgba(242,101,34,.7)} 100%{text-shadow:0 0 20px rgba(242,101,34,.1)} }
+  @keyframes siteReveal   { from{opacity:0;transform:scale(1.04)} to{opacity:1;transform:scale(1)} }
+  @keyframes abGlowFloat  { 0%,100%{transform:translateY(0) scale(1);opacity:.6} 50%{transform:translateY(-18px) scale(1.04);opacity:.9} }
+  @keyframes sk2Up        { from{opacity:0;transform:translateY(28px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes heroNavFade  { from{opacity:0;transform:translateY(-14px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes slideTrack   { 0%{transform:translateX(var(--from))} 100%{transform:translateX(var(--to))} }
+  @keyframes lgPulse      { 0%,100%{box-shadow:0 0 0 1px rgba(242,101,34,.3),0 8px 40px rgba(0,0,0,.6),0 0 60px rgba(242,101,34,.08)} 50%{box-shadow:0 0 0 1px rgba(242,101,34,.6),0 8px 50px rgba(0,0,0,.7),0 0 80px rgba(242,101,34,.18)} }
+  @keyframes shimmer      { 0%{background-position:200% center} 100%{background-position:-200% center} }
+  @keyframes cardFlip     { from{opacity:0;transform:translateY(16px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes skillPop     { from{opacity:0;transform:scale(.88) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes countUp      { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .fu  { animation:fadeUp .6s ease both; }
+  .fu1 { animation-delay:.05s; }
+  .fu2 { animation-delay:.18s; }
+  .fu3 { animation-delay:.32s; }
+  .fu4 { animation-delay:.46s; }
+  .site-enter { animation:siteReveal .8s ease both; }
+
+  .btn-primary { animation:pulseGlow 2.5s ease-in-out infinite; transition:transform .2s ease,filter .2s ease; }
+  .btn-primary:hover { transform:scale(1.06); filter:brightness(1.12); }
+  .btn-ghost { transition:background .2s ease,border-color .2s ease; }
+  .btn-ghost:hover { background:rgba(242,101,34,.1)!important; border-color:rgba(242,101,34,.7)!important; }
+
+  .hn-link {
+    padding:8px 18px; border-radius:50px;
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:13.5px; font-weight:600;
+    letter-spacing:-0.01em; text-decoration:none; white-space:nowrap;
+    transition:color .2s ease,background .2s ease,box-shadow .2s ease;
+    cursor:pointer;
   }
-  @keyframes floatSlow {
-    0%,100% { transform: translateY(0px); }
-    50%      { transform: translateY(-10px); }
+  .hn-link:hover:not(.hn-active) { color:rgba(255,255,255,.95)!important; background:rgba(255,255,255,.09)!important; }
+  .hn-active { background:linear-gradient(135deg,#f26522,#c04a00)!important; color:#fff!important; font-weight:700!important; box-shadow:0 4px 18px rgba(242,101,34,.45),inset 0 1px 0 rgba(255,255,255,.25); }
+  .hn-cv { transition:background .22s,border-color .22s,transform .2s; }
+  .hn-cv:hover { background:rgba(242,101,34,.1)!important; border-color:rgba(242,101,34,.6)!important; transform:translateY(-1px); }
+
+  .lg-nav {
+    animation: lgPulse 3.5s ease-in-out infinite;
+    transition: transform 0.5s cubic-bezier(.34,1.28,.64,1), opacity 0.4s ease;
   }
-  @keyframes spinRing {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+  .lg-nav-link {
+    position:relative; display:flex; align-items:center;
+    padding:8px 16px; border-radius:50px;
+    font-family:'Plus Jakarta Sans',sans-serif; font-size:12.5px; font-weight:600;
+    letter-spacing:-0.01em; text-decoration:none; white-space:nowrap;
+    transition:color .22s ease, background .22s ease, transform .22s cubic-bezier(.34,1.56,.64,1);
+    cursor:pointer; overflow:hidden;
   }
-  @keyframes spinRingRev {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(-360deg); }
+  .lg-nav-link::before {
+    content:''; position:absolute; inset:0; border-radius:50px;
+    background:linear-gradient(135deg,rgba(255,255,255,.18),rgba(255,255,255,.04));
+    opacity:0; transition:opacity .22s ease;
   }
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(28px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  @keyframes pulseGlow {
-    0%,100% { box-shadow: 0 8px 30px rgba(242,101,34,0.4); }
-    50%      { box-shadow: 0 8px 55px rgba(242,101,34,0.75); }
-  }
-  @keyframes loadFadeIn {
-    from { opacity:0; transform: translateY(12px); }
-    to   { opacity:1; transform: translateY(0); }
-  }
-  @keyframes netflixBgFade {
-    0%   { opacity:1; }
-    80%  { opacity:1; }
-    100% { opacity:0; }
-  }
-  @keyframes netflixLetterZoom {
-    0%   { transform: scale(0.7); opacity:0; }
-    12%  { transform: scale(0.85); opacity:1; }
-    70%  { transform: scale(7); opacity:1; }
-    88%  { transform: scale(12); opacity:0; }
-    100% { transform: scale(14); opacity:0; }
-  }
-  @keyframes netflixSoundWave {
-    0%,100% { height: 4px; }
-    50%     { height: 20px; }
-  }
-  @keyframes netflixGlow {
-    0%   { text-shadow: 0 0 20px rgba(242,101,34,0.3); }
-    40%  { text-shadow: 0 0 60px rgba(242,101,34,0.9), 0 0 120px rgba(242,101,34,0.5); }
-    70%  { text-shadow: 0 0 100px rgba(242,101,34,1), 0 0 200px rgba(242,101,34,0.7); }
-    100% { text-shadow: 0 0 20px rgba(242,101,34,0.1); }
-  }
-  @keyframes siteReveal {
-    from { opacity:0; transform: scale(1.04); }
-    to   { opacity:1; transform: scale(1); }
-  }
-  @keyframes skillTagFloat {
-    0%,100% { transform: translateY(0); }
-    50%     { transform: translateY(-4px); }
-  }
-  @keyframes abBlink {
-    0%,100% { opacity:1; box-shadow: 0 0 6px #22c55e; }
-    50%      { opacity:0.4; box-shadow: none; }
+  .lg-nav-link:hover::before { opacity:1; }
+  .lg-nav-link:hover:not(.lg-active) { color:rgba(255,255,255,.9)!important; transform:translateY(-2px); }
+  .lg-active {
+    background:linear-gradient(135deg,rgba(242,101,34,.9),rgba(192,74,0,.85))!important;
+    color:#fff!important;
+    box-shadow:0 4px 20px rgba(242,101,34,.55),inset 0 1px 0 rgba(255,255,255,.3),inset 0 -1px 0 rgba(0,0,0,.15);
   }
 
-  .fu  { animation: fadeUp 0.6s ease both; }
-  .fu1 { animation-delay: 0.05s; }
-  .fu2 { animation-delay: 0.18s; }
-  .fu3 { animation-delay: 0.32s; }
-  .fu4 { animation-delay: 0.46s; }
+  .ab-info-card { transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease; cursor:default; }
+  .ab-info-card:hover { transform:translateY(-6px); box-shadow:0 20px 50px rgba(242,101,34,.18)!important; border-color:rgba(242,101,34,.35)!important; }
 
-  .site-enter { animation: siteReveal 0.8s ease both; }
-
-  .btn-primary {
-    animation: pulseGlow 2.5s ease-in-out infinite;
-    transition: transform 0.2s ease, filter 0.2s ease;
+  .sk-chip {
+    transition: transform .22s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease, border-color .22s ease, background .22s ease;
   }
-  .btn-primary:hover { transform: scale(1.06); filter: brightness(1.12); }
-  .btn-ghost { transition: background 0.2s ease, border-color 0.2s ease; }
-  .btn-ghost:hover {
-    background: rgba(242,101,34,0.1) !important;
-    border-color: rgba(242,101,34,0.7) !important;
+  .sk-chip:hover {
+    transform: translateY(-3px) scale(1.05);
   }
 
-  .nav-link { transition: all 0.22s ease; }
+  .sk-card { transition:transform .28s ease,box-shadow .28s ease,border-color .28s ease; }
+  .sk-card:hover { transform:translateY(-5px); box-shadow:0 20px 48px rgba(242,101,34,.2)!important; border-color:rgba(242,101,34,.4)!important; }
 
-  .proj-card {
-    transition: transform 0.28s ease, box-shadow 0.28s ease;
-    cursor: pointer;
-  }
-  .proj-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 24px 60px rgba(242,101,34,0.22) !important;
-  }
-  .proj-card:hover .proj-img-overlay { opacity:1 !important; }
-  .proj-card:hover .proj-img { transform: scale(1.06); }
-
-  .skill-badge {
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
-    cursor: default;
-  }
-  .skill-badge:hover { transform: translateY(-3px) scale(1.06); }
+  .proj-card-new { transition:transform .28s ease,box-shadow .28s ease; }
+  .proj-card-new:hover { transform:translateY(-6px); box-shadow:0 24px 60px rgba(242,101,34,.22)!important; }
 `;
 
-/* ─────────────────────────────────────────────
-   SVG ICONS
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   SVG ICONS — REAL BRAND/TECH ICONS (no emojis)
+═══════════════════════════════════════════════════════════════════════════ */
 const Icons = {
   React: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
@@ -375,72 +153,6 @@ const Icons = {
       />
     </svg>
   ),
-  OpenAI: ({ size = 22 }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <path
-        d="M29.1 13.4a7.6 7.6 0 00-.65-6.23 7.7 7.7 0 00-8.3-3.7A7.7 7.7 0 0014.3 1a7.7 7.7 0 00-7.34 5.33A7.7 7.7 0 002.9 9.9a7.72 7.72 0 001 9.46 7.6 7.6 0 00.65 6.23 7.7 7.7 0 008.3 3.7A7.65 7.65 0 0017.7 31a7.7 7.7 0 007.35-5.34 7.7 7.7 0 004.07-3.57 7.72 7.72 0 00-1.01-9.46zM17.7 29.1a5.72 5.72 0 01-3.67-1.33l.18-.1 6.1-3.52a1 1 0 00.5-.87v-8.6l2.58 1.49v.07a5.77 5.77 0 01-5.7 6.36zM5.06 23.77a5.75 5.75 0 01-.69-3.86l.19.11 6.09 3.52a1 1 0 001 0l7.44-4.3v2.98l.01.06-6.16 3.56a5.77 5.77 0 01-7.88-2.07zm-.87-12.65a5.72 5.72 0 012.97-2.52v7.23a1 1 0 00.5.87l7.44 4.3-2.58 1.48h-.07L6.3 18.9a5.77 5.77 0 01-2.1-7.78zm21.25 4.96l-7.44-4.3 2.58-1.49h.07l6.15 3.55a5.77 5.77 0 01-.9 10.4v-7.23a1 1 0 00-.46-.93zm2.57-3.87l-.19-.11-6.09-3.52a1 1 0 00-1 0l-7.44 4.3V9.9l6.16-3.55a5.76 5.76 0 018.56 5.96zM11.7 17.46L9.12 16v-.07a5.77 5.77 0 015.7-6.36 5.72 5.72 0 013.66 1.33l-.18.1-6.1 3.52a1 1 0 00-.5.87v.07zm1.4-3.02l3.32-1.92 3.31 1.91v3.83L16.4 20.2l-3.31-1.92v-3.83z"
-        fill="white"
-      />
-    </svg>
-  ),
-  FAISS: ({ size = 22 }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="6" fill="#6366F1" />
-      <circle cx="16" cy="16" r="4" fill="white" opacity="0.9" />
-      <circle cx="8" cy="10" r="2.5" fill="white" opacity="0.6" />
-      <circle cx="24" cy="10" r="2.5" fill="white" opacity="0.6" />
-      <circle cx="8" cy="22" r="2.5" fill="white" opacity="0.6" />
-      <circle cx="24" cy="22" r="2.5" fill="white" opacity="0.6" />
-      <line
-        x1="16"
-        y1="12"
-        x2="9.5"
-        y2="11.5"
-        stroke="white"
-        strokeWidth="1"
-        opacity="0.5"
-      />
-      <line
-        x1="16"
-        y1="12"
-        x2="22.5"
-        y2="11.5"
-        stroke="white"
-        strokeWidth="1"
-        opacity="0.5"
-      />
-      <line
-        x1="16"
-        y1="20"
-        x2="9.5"
-        y2="20.5"
-        stroke="white"
-        strokeWidth="1"
-        opacity="0.5"
-      />
-      <line
-        x1="16"
-        y1="20"
-        x2="22.5"
-        y2="20.5"
-        stroke="white"
-        strokeWidth="1"
-        opacity="0.5"
-      />
-    </svg>
-  ),
-  Docker: ({ size = 22 }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <path
-        d="M13 14h3v3h-3zM17 14h3v3h-3zM17 10h3v3h-3zM13 10h3v3h-3zM9 14h3v3H9zM21 14h3v3h-3z"
-        fill="#2496ED"
-      />
-      <path
-        d="M29.6 15.3a5.5 5.5 0 00-3.4-.9h-.3c-.4-2.4-2-3.9-4.8-4.4l-.8-.2-.3.8c-.4 1-.5 2-.3 3-.4-.2-.9-.4-1.4-.4H2.8l-.1.5C2.4 15 2.5 17 3.5 18.5c1.2 1.7 2.9 2.5 5.5 2.5 5.2 0 9.1-2.4 10.9-6.7.7.1 2 .1 2.7-.6.5-.5.7-1 .8-1.3l.1-.4-.9-.7z"
-        fill="#2496ED"
-      />
-    </svg>
-  ),
   MongoDB: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       <path
@@ -456,17 +168,24 @@ const Icons = {
       />
     </svg>
   ),
-  LangChain: ({ size = 22 }) => (
+  SQL: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="6" fill="#1C1C1C" />
-      <path d="M6 12h8l2 4-2 4H6l2-4-2-4z" fill="#00D084" opacity="0.9" />
-      <path d="M26 12h-8l-2 4 2 4h8l-2-4 2-4z" fill="#00D084" opacity="0.6" />
-      <line x1="14" y1="16" x2="18" y2="16" stroke="#00D084" strokeWidth="2" />
-    </svg>
-  ),
-  Lightning: ({ size = 22, color = "#f26522" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-      <path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2z" />
+      <rect width="32" height="32" rx="6" fill="#00758F" />
+      <ellipse cx="16" cy="9" rx="9" ry="4" fill="#F29111" opacity="0.9" />
+      <path
+        d="M7 9v5c0 2.2 4 4 9 4s9-1.8 9-4V9"
+        stroke="#F29111"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.7"
+      />
+      <path
+        d="M7 14v5c0 2.2 4 4 9 4s9-1.8 9-4v-5"
+        stroke="#F29111"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.5"
+      />
     </svg>
   ),
   Robot: ({ size = 22 }) => (
@@ -508,24 +227,9 @@ const Icons = {
       <polygon points="26,10 26,22 16,16" fill="#10B981" opacity="0.6" />
     </svg>
   ),
-  SQL: ({ size = 22 }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="6" fill="#00758F" />
-      <ellipse cx="16" cy="9" rx="9" ry="4" fill="#F29111" opacity="0.9" />
-      <path
-        d="M7 9v5c0 2.2 4 4 9 4s9-1.8 9-4V9"
-        stroke="#F29111"
-        strokeWidth="1.5"
-        fill="none"
-        opacity="0.7"
-      />
-      <path
-        d="M7 14v5c0 2.2 4 4 9 4s9-1.8 9-4v-5"
-        stroke="#F29111"
-        strokeWidth="1.5"
-        fill="none"
-        opacity="0.5"
-      />
+  Lightning: ({ size = 22, color = "#f26522" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M13 2L4.5 13.5H11L10 22L20.5 10H14L13 2z" />
     </svg>
   ),
   Mail: ({ size = 16 }) => (
@@ -558,137 +262,373 @@ const Icons = {
       <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
     </svg>
   ),
+  // Real tech icons for skill badges
+  LangChain: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#1C1C1C" />
+      <path
+        d="M8 16c0-4.4 3.6-8 8-8s8 3.6 8 8"
+        stroke="#1DB954"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M8 16c0 4.4 3.6 8 8 8"
+        stroke="#f26522"
+        strokeWidth="2.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="16" cy="16" r="2.5" fill="#1DB954" />
+      <circle cx="8" cy="16" r="2" fill="#f26522" />
+      <circle cx="24" cy="16" r="2" fill="#1DB954" />
+    </svg>
+  ),
+  OpenAI: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#10a37f" />
+      <path
+        d="M22.3 13.1a5.5 5.5 0 00-.4-4.5 5.6 5.6 0 00-6-2.7A5.6 5.6 0 0011.7 4a5.6 5.6 0 00-5.3 3.8 5.5 5.5 0 00-3.7 2.7 5.6 5.6 0 00.7 6.6 5.5 5.5 0 00.4 4.5 5.6 5.6 0 006 2.7 5.6 5.6 0 004.2 1.9 5.6 5.6 0 005.3-3.9 5.5 5.5 0 003.7-2.7 5.6 5.6 0 00-.7-6.5z"
+        fill="white"
+        opacity="0.9"
+      />
+    </svg>
+  ),
+  VectorDB: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#0f172a" />
+      <ellipse cx="16" cy="10" rx="9" ry="3.5" fill="#6366f1" opacity="0.8" />
+      <path
+        d="M7 10v6c0 1.9 4 3.5 9 3.5s9-1.6 9-3.5v-6"
+        stroke="#6366f1"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.6"
+      />
+      <path
+        d="M7 16v6c0 1.9 4 3.5 9 3.5s9-1.6 9-3.5v-6"
+        stroke="#6366f1"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.4"
+      />
+    </svg>
+  ),
+  LangGraph: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#1a0a2e" />
+      <circle cx="16" cy="16" r="3" fill="#A78BFA" />
+      <circle cx="8" cy="10" r="2.5" fill="#A78BFA" opacity="0.7" />
+      <circle cx="24" cy="10" r="2.5" fill="#A78BFA" opacity="0.7" />
+      <circle cx="8" cy="22" r="2.5" fill="#A78BFA" opacity="0.7" />
+      <circle cx="24" cy="22" r="2.5" fill="#A78BFA" opacity="0.7" />
+      <line
+        x1="13"
+        y1="15"
+        x2="10"
+        y2="11.5"
+        stroke="#A78BFA"
+        strokeWidth="1.2"
+        opacity="0.5"
+      />
+      <line
+        x1="19"
+        y1="15"
+        x2="22"
+        y2="11.5"
+        stroke="#A78BFA"
+        strokeWidth="1.2"
+        opacity="0.5"
+      />
+      <line
+        x1="13"
+        y1="17"
+        x2="10"
+        y2="20.5"
+        stroke="#A78BFA"
+        strokeWidth="1.2"
+        opacity="0.5"
+      />
+      <line
+        x1="19"
+        y1="17"
+        x2="22"
+        y2="20.5"
+        stroke="#A78BFA"
+        strokeWidth="1.2"
+        opacity="0.5"
+      />
+    </svg>
+  ),
+  NodeJS: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <path
+        d="M16 3L4 9.5v13L16 29l12-6.5v-13L16 3z"
+        fill="#339933"
+        opacity="0.15"
+      />
+      <path
+        d="M16 5L5.5 10.7v10.6L16 27l10.5-5.7V10.7L16 5z"
+        stroke="#339933"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      <text
+        x="10"
+        y="21"
+        fontFamily="monospace"
+        fontSize="11"
+        fontWeight="bold"
+        fill="#339933"
+      >
+        JS
+      </text>
+    </svg>
+  ),
   FastAPI: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <circle cx="16" cy="16" r="14" fill="#009688" />
-      <path d="M17 6l-7 11h6l-1 9 7-11h-6z" fill="white" />
+      <rect width="32" height="32" rx="8" fill="#009688" opacity="0.15" />
+      <rect
+        width="32"
+        height="32"
+        rx="8"
+        stroke="#009688"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      <path d="M17 6l-8 12h7l-3 8 10-14h-7l1-6z" fill="#009688" />
     </svg>
   ),
-  Tailwind: ({ size = 22 }) => (
+  Docker: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#0db7ed" opacity="0.1" />
+      <rect x="5" y="14" width="4" height="4" rx="1" fill="#0db7ed" />
+      <rect x="10" y="14" width="4" height="4" rx="1" fill="#0db7ed" />
+      <rect x="15" y="14" width="4" height="4" rx="1" fill="#0db7ed" />
+      <rect x="10" y="9" width="4" height="4" rx="1" fill="#0db7ed" />
+      <rect x="15" y="9" width="4" height="4" rx="1" fill="#0db7ed" />
       <path
-        d="M9 13.5c1-4 3.5-6 7.5-6 6 0 6.75 4.5 9.75 5.25C28.5 13.5 30.5 12 32 10.5c-1 4-3.5 6-7.5 6-6 0-6.75-4.5-9.75-5.25C12.5 10.5 10.5 12 9 13.5zm-9 9c1-4 3.5-6 7.5-6 6 0 6.75 4.5 9.75 5.25C19.5 22.5 21.5 21 23 19.5c-1 4-3.5 6-7.5 6-6 0-6.75-4.5-9.75-5.25C3.5 19.5 1.5 21 0 22.5z"
-        fill="#38BDF8"
-      />
-    </svg>
-  ),
-  JS: ({ size = 22 }) => (
-    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
-      <rect width="32" height="32" rx="4" fill="#F7DF1E" />
-      <path
-        d="M9.5 25.5L12 24c.5 1 .9 1.8 2 1.8 1 0 1.7-.4 1.7-2V13h3v10.8c0 3.3-1.9 4.8-4.7 4.8-2.5 0-3.9-1.3-4.5-2.9z"
-        fill="#323330"
-      />
-    </svg>
-  ),
-  Monitor: ({ size = 22, color = "#61DAFB" }) => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="3" width="20" height="14" rx="2" />
-      <line x1="8" y1="21" x2="16" y2="21" />
-      <line x1="12" y1="17" x2="12" y2="21" />
-    </svg>
-  ),
-  Server: ({ size = 22, color = "#2496ED" }) => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="2" y="2" width="20" height="8" rx="2" />
-      <rect x="2" y="14" width="20" height="8" rx="2" />
-      <line x1="6" y1="6" x2="6.01" y2="6" />
-      <line x1="6" y1="18" x2="6.01" y2="18" />
-    </svg>
-  ),
-  Database: ({ size = 22, color = "#F6AD55" }) => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <ellipse cx="12" cy="5" rx="9" ry="3" />
-      <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
-      <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
-    </svg>
-  ),
-  Cpu: ({ size = 22, color = "#A78BFA" }) => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="4" y="4" width="16" height="16" rx="2" />
-      <rect x="9" y="9" width="6" height="6" />
-      <line x1="9" y1="1" x2="9" y2="4" />
-      <line x1="15" y1="1" x2="15" y2="4" />
-      <line x1="9" y1="20" x2="9" y2="23" />
-      <line x1="15" y1="20" x2="15" y2="23" />
-      <line x1="20" y1="9" x2="23" y2="9" />
-      <line x1="20" y1="14" x2="23" y2="14" />
-      <line x1="1" y1="9" x2="4" y2="9" />
-      <line x1="1" y1="14" x2="4" y2="14" />
-    </svg>
-  ),
-  Wrench: ({ size = 22, color = "#F97316" }) => (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke={color}
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
-    </svg>
-  ),
-  Rocket: ({ size = 22, color = "#f26522" }) => (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 2C12 2 7 7 7 13c0 2.8 1.2 5.3 3 7l2 2 2-2c1.8-1.7 3-4.2 3-7 0-6-5-11-5-11z"
-        fill={color}
-        opacity="0.8"
-      />
-      <circle cx="12" cy="12" r="2" fill="white" />
-      <path
-        d="M9 16l-3 4M15 16l3 4"
-        stroke={color}
+        d="M26.5 16.5s-.5-2-2.5-1.5c0 0-.5-3-4-2.5"
+        stroke="#0db7ed"
         strokeWidth="1.5"
         strokeLinecap="round"
-        opacity="0.7"
+        fill="none"
+      />
+      <path
+        d="M3 19s1 4 7 3.5h10c3 0 5-2 5-4.5"
+        stroke="#0db7ed"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  ),
+  Git: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#F05032" opacity="0.1" />
+      <path
+        d="M29 14.6L17.4 3a1.7 1.7 0 00-2.4 0L12.7 5.3l3 3A2 2 0 0118 11v.3l2.9 2.9a2 2 0 012.6 2.6 2 2 0 01-2 2 2 2 0 01-2-2c0-.3 0-.5.1-.8L17 13.4V21a2 2 0 01.5 3.4 2 2 0 01-2.8-.7 2 2 0 01.7-2.7 2 2 0 011.1-.2v-7.8a2 2 0 01-1.3-2.6L12.3 8 3 17.3a1.7 1.7 0 000 2.4l11.6 11.6a1.7 1.7 0 002.4 0L29 17a1.7 1.7 0 000-2.4z"
+        fill="#F05032"
+      />
+    </svg>
+  ),
+  Vercel: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.05)" />
+      <path d="M16 6L28 26H4L16 6z" fill="white" />
+    </svg>
+  ),
+  HuggingFace: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#FFD21E" opacity="0.15" />
+      <circle cx="16" cy="17" r="10" fill="#FFD21E" opacity="0.8" />
+      <circle cx="12" cy="15" r="1.8" fill="#333" />
+      <circle cx="20" cy="15" r="1.8" fill="#333" />
+      <path
+        d="M11 21c1.2 1.5 3 2.5 5 2.5s3.8-1 5-2.5"
+        stroke="#333"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M10 10c0-2 3-4 6-2"
+        stroke="#FF6B6B"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <path
+        d="M22 10c0-2-3-4-6-2"
+        stroke="#FF6B6B"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  ),
+  FAISS: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#1565C0" opacity="0.15" />
+      <rect
+        x="6"
+        y="6"
+        width="8"
+        height="8"
+        rx="2"
+        fill="#1565C0"
+        opacity="0.8"
+      />
+      <rect
+        x="18"
+        y="6"
+        width="8"
+        height="8"
+        rx="2"
+        fill="#1565C0"
+        opacity="0.5"
+      />
+      <rect
+        x="6"
+        y="18"
+        width="8"
+        height="8"
+        rx="2"
+        fill="#1565C0"
+        opacity="0.5"
+      />
+      <rect
+        x="18"
+        y="18"
+        width="8"
+        height="8"
+        rx="2"
+        fill="#1565C0"
+        opacity="0.8"
+      />
+      <line
+        x1="14"
+        y1="10"
+        x2="18"
+        y2="10"
+        stroke="#1565C0"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="10"
+        y1="14"
+        x2="10"
+        y2="18"
+        stroke="#1565C0"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="14"
+        y1="22"
+        x2="18"
+        y2="22"
+        stroke="#1565C0"
+        strokeWidth="1.5"
+      />
+      <line
+        x1="22"
+        y1="14"
+        x2="22"
+        y2="18"
+        stroke="#1565C0"
+        strokeWidth="1.5"
+      />
+    </svg>
+  ),
+  Chroma: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#FF6B35" opacity="0.1" />
+      <circle
+        cx="16"
+        cy="16"
+        r="9"
+        stroke="#FF6B35"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      <circle cx="16" cy="16" r="5" fill="#FF6B35" opacity="0.6" />
+      <circle cx="16" cy="16" r="2" fill="#FF6B35" />
+    </svg>
+  ),
+  Postman: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#FF6C37" opacity="0.1" />
+      <circle
+        cx="16"
+        cy="16"
+        r="10"
+        stroke="#FF6C37"
+        strokeWidth="1.5"
+        fill="none"
+      />
+      <path d="M16 10l4 6-4 6-4-6 4-6z" fill="#FF6C37" opacity="0.7" />
+    </svg>
+  ),
+  Ollama: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="rgba(255,255,255,0.05)" />
+      <circle
+        cx="16"
+        cy="14"
+        r="7"
+        stroke="white"
+        strokeWidth="1.5"
+        fill="none"
+        opacity="0.8"
+      />
+      <circle cx="13" cy="13" r="1.5" fill="white" opacity="0.8" />
+      <circle cx="19" cy="13" r="1.5" fill="white" opacity="0.8" />
+      <path
+        d="M12 18c1 2 7 2 8 0"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        fill="none"
+        opacity="0.8"
+      />
+      <path
+        d="M10 21h12"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.4"
+      />
+      <path
+        d="M12 24h8"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.3"
+      />
+    </svg>
+  ),
+  PubMed: ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
+      <rect width="32" height="32" rx="8" fill="#2E86AB" opacity="0.15" />
+      <path d="M8 8h16v3H8z" fill="#2E86AB" opacity="0.8" rx="1" />
+      <path d="M8 13h12v2H8z" fill="#2E86AB" opacity="0.6" />
+      <path d="M8 17h14v2H8z" fill="#2E86AB" opacity="0.6" />
+      <path d="M8 21h10v2H8z" fill="#2E86AB" opacity="0.4" />
+      <circle cx="24" cy="22" r="5" fill="#2E86AB" opacity="0.9" />
+      <path
+        d="M22 22h4M24 20v4"
+        stroke="white"
+        strokeWidth="1.5"
+        strokeLinecap="round"
       />
     </svg>
   ),
 };
 
-/* ─────────────────────────────────────────────
-   NETFLIX INTRO + LOADING
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   NETFLIX INTRO
+═══════════════════════════════════════════════════════════════════════════ */
 function NetflixIntro({ onComplete }) {
   const [phase, setPhase] = useState("loading");
   const [progress, setProgress] = useState(0);
@@ -729,7 +669,7 @@ function NetflixIntro({ onComplete }) {
             fontSize: 34,
             fontWeight: 800,
             color: "#f5f0e8",
-            animation: "loadFadeIn 0.5s ease both",
+            animation: "loadFadeIn .5s ease both",
           }}
         >
           aditya<span style={{ color: "#f26522" }}>.</span>
@@ -738,7 +678,7 @@ function NetflixIntro({ onComplete }) {
           style={{
             width: 260,
             height: 2.5,
-            background: "rgba(255,255,255,0.08)",
+            background: "rgba(255,255,255,.08)",
             borderRadius: 3,
             overflow: "hidden",
           }}
@@ -749,7 +689,7 @@ function NetflixIntro({ onComplete }) {
               height: "100%",
               background: "linear-gradient(90deg,#f26522,#ff9a50)",
               borderRadius: 3,
-              transition: "width 0.1s ease",
+              transition: "width .1s ease",
             }}
           />
         </div>
@@ -775,7 +715,7 @@ function NetflixIntro({ onComplete }) {
             fontFamily: "Plus Jakarta Sans,sans-serif",
             fontSize: 48,
             fontWeight: 800,
-            color: "rgba(242,101,34,0.15)",
+            color: "rgba(242,101,34,.15)",
             letterSpacing: "-0.04em",
             position: "absolute",
             bottom: 48,
@@ -796,8 +736,7 @@ function NetflixIntro({ onComplete }) {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        animation:
-          phase === "out" ? "netflixBgFade 0.6s ease forwards" : "none",
+        animation: phase === "out" ? "netflixBgFade .6s ease forwards" : "none",
       }}
     >
       <div
@@ -808,12 +747,12 @@ function NetflixIntro({ onComplete }) {
           color: "#f26522",
           lineHeight: 1,
           animation:
-            "netflixLetterZoom 2.4s cubic-bezier(0.33, 1, 0.68, 1) forwards, netflixGlow 2.4s ease forwards",
+            "netflixLetterZoom 2.4s cubic-bezier(.33,1,.68,1) forwards, netflixGlow 2.4s ease forwards",
           letterSpacing: "-0.05em",
           userSelect: "none",
         }}
       >
-        aditya.
+        {"</>"}
       </div>
       <div
         style={{
@@ -834,7 +773,7 @@ function NetflixIntro({ onComplete }) {
               background: "#f26522",
               borderRadius: 2,
               opacity: 0.7,
-              animation: `netflixSoundWave 0.8s ease-in-out infinite`,
+              animation: `netflixSoundWave .8s ease-in-out infinite`,
               animationDelay: `${d}s`,
               height: 4,
             }}
@@ -845,39 +784,10 @@ function NetflixIntro({ onComplete }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   AVATAR — 3D tilt
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   AVATAR
+═══════════════════════════════════════════════════════════════════════════ */
 function Avatar3D({ photoUrl }) {
-  const charRef = useRef(null);
-  const bgRef = useRef(null);
-
-  useEffect(() => {
-    const hero = document.getElementById("home");
-    if (!hero) return;
-    const onMove = (e) => {
-      const r = hero.getBoundingClientRect();
-      const dx = (e.clientX - r.left - r.width / 2) / (r.width / 2);
-      const dy = (e.clientY - r.top - r.height / 2) / (r.height / 2);
-      if (charRef.current)
-        charRef.current.style.transform = `perspective(700px) rotateY(${dx * 10}deg) rotateX(${-dy * 7}deg) translateZ(10px)`;
-      if (bgRef.current)
-        bgRef.current.style.transform = `translate(${dx * -20}px, ${dy * -14}px)`;
-    };
-    const onLeave = () => {
-      if (charRef.current)
-        charRef.current.style.transform =
-          "perspective(700px) rotateY(0deg) rotateX(0deg) translateZ(0)";
-      if (bgRef.current) bgRef.current.style.transform = "translate(0,0)";
-    };
-    hero.addEventListener("mousemove", onMove);
-    hero.addEventListener("mouseleave", onLeave);
-    return () => {
-      hero.removeEventListener("mousemove", onMove);
-      hero.removeEventListener("mouseleave", onLeave);
-    };
-  }, []);
-
   const badges = [
     {
       Icon: Icons.Python,
@@ -934,7 +844,6 @@ function Avatar3D({ photoUrl }) {
       r: "4deg",
     },
   ];
-
   return (
     <div
       style={{
@@ -947,7 +856,6 @@ function Avatar3D({ photoUrl }) {
       }}
     >
       <div
-        ref={bgRef}
         style={{
           position: "absolute",
           inset: 0,
@@ -955,7 +863,6 @@ function Avatar3D({ photoUrl }) {
           alignItems: "center",
           justifyContent: "center",
           pointerEvents: "none",
-          transition: "transform 0.15s ease",
         }}
       >
         <div
@@ -965,7 +872,7 @@ function Avatar3D({ photoUrl }) {
             height: 380,
             borderRadius: "50%",
             background:
-              "radial-gradient(circle, rgba(242,101,34,0.18) 0%, transparent 70%)",
+              "radial-gradient(circle,rgba(242,101,34,.18) 0%,transparent 70%)",
             filter: "blur(30px)",
           }}
         />
@@ -974,7 +881,7 @@ function Avatar3D({ photoUrl }) {
             position: "absolute",
             width: 460,
             height: 460,
-            border: "1.5px solid rgba(242,101,34,0.13)",
+            border: "1.5px solid rgba(242,101,34,.13)",
             borderRadius: "50%",
             animation: "spinRing 22s linear infinite",
           }}
@@ -984,7 +891,7 @@ function Avatar3D({ photoUrl }) {
             position: "absolute",
             width: 330,
             height: 330,
-            border: "1px solid rgba(242,101,34,0.09)",
+            border: "1px solid rgba(242,101,34,.09)",
             borderRadius: "50%",
             animation: "spinRingRev 15s linear infinite",
           }}
@@ -994,7 +901,7 @@ function Avatar3D({ photoUrl }) {
             position: "absolute",
             width: 210,
             height: 210,
-            border: "1px dashed rgba(242,101,34,0.06)",
+            border: "1px dashed rgba(242,101,34,.06)",
             borderRadius: "50%",
             animation: "spinRing 10s linear infinite",
           }}
@@ -1017,7 +924,7 @@ function Avatar3D({ photoUrl }) {
             alignItems: "center",
             justifyContent: "center",
             zIndex: 20,
-            boxShadow: `0 0 22px ${border}28, 0 4px 18px rgba(0,0,0,0.55)`,
+            boxShadow: `0 0 22px ${border}28,0 4px 18px rgba(0,0,0,.55)`,
             "--rot": r,
             animation: "floatY 3s ease-in-out infinite",
             animationDelay: d,
@@ -1028,29 +935,26 @@ function Avatar3D({ photoUrl }) {
         </div>
       ))}
       <div
-        ref={charRef}
         style={{
           position: "relative",
           zIndex: 10,
-          transition: "transform 0.12s ease",
-          transformStyle: "preserve-3d",
           filter:
-            "drop-shadow(0 40px 60px rgba(242,101,34,0.45)) drop-shadow(0 20px 30px rgba(0,0,0,0.6))",
+            "drop-shadow(0 40px 60px rgba(242,101,34,.45)) drop-shadow(0 20px 30px rgba(0,0,0,.6))",
           marginBottom: -8,
         }}
       >
         <div style={{ animation: "floatSlow 4s ease-in-out infinite" }}>
           <img
             src={photoUrl}
-            alt="Character"
+            alt="Aditya"
             style={{
               width: 520,
               height: "auto",
               marginBottom: -40,
               marginLeft: -50,
               objectFit: "contain",
-              transform: "translate(-35px, 10px)",
-              filter: "drop-shadow(0 30px 60px rgba(242,101,34,0.5))",
+              transform: "translate(-35px,10px)",
+              filter: "drop-shadow(0 30px 60px rgba(242,101,34,.5))",
             }}
           />
         </div>
@@ -1059,150 +963,434 @@ function Avatar3D({ photoUrl }) {
   );
 }
 
-/* ─────────────────────────────────────────────
-   ABOUT SECTION — redesigned with rich animations
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   HERO NAVBAR
+═══════════════════════════════════════════════════════════════════════════ */
+function HeroNav({ visible, activeSection, onNavClick, cvUrl }) {
+  const [scrolled, setScrolled] = useState(false);
+  const NAV = ["Home", "About", "Skills", "Projects", "Connect"];
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  return (
+    <header
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 100,
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "auto" : "none",
+        transition: "opacity 0.35s ease",
+        width: "100%",
+        height: scrolled ? 60 : 72,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "0 52px",
+        background: scrolled ? "rgba(14,6,0,0.75)" : "transparent",
+        backdropFilter: scrolled ? "blur(28px) saturate(200%)" : "none",
+        WebkitBackdropFilter: scrolled ? "blur(28px) saturate(200%)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,.05)" : "none",
+        animation: "heroNavFade .5s ease both",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          left: 52,
+          fontFamily: "Plus Jakarta Sans,sans-serif",
+          fontSize: 22,
+          fontWeight: 800,
+          letterSpacing: "-0.01em",
+          color: "#f5f0e8",
+        }}
+      >
+        aditya<span style={{ color: "#f26522" }}>.</span>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 2,
+          padding: "5px 6px",
+          borderRadius: 50,
+          background: "rgba(255,255,255,.07)",
+          backdropFilter: "blur(40px) saturate(220%)",
+          WebkitBackdropFilter: "blur(40px) saturate(220%)",
+          border: "1px solid rgba(255,255,255,.15)",
+          boxShadow:
+            "inset 0 1px 0 rgba(255,255,255,.2),inset 0 -1px 0 rgba(0,0,0,.15),0 8px 32px rgba(0,0,0,.45)",
+        }}
+      >
+        {NAV.map((item) => (
+          <a
+            key={item}
+            href={`#${item.toLowerCase()}`}
+            className={`hn-link${activeSection === item ? " hn-active" : ""}`}
+            onClick={() => onNavClick(item)}
+            style={{
+              color: activeSection === item ? "#fff" : "rgba(255,255,255,.65)",
+            }}
+          >
+            {item}
+          </a>
+        ))}
+      </div>
+      {cvUrl && (
+        <a
+          href={cvUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="hn-cv"
+          style={{
+            position: "absolute",
+            right: 52,
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            padding: "9px 18px",
+            borderRadius: 50,
+            background: "rgba(255,255,255,.05)",
+            border: "1px solid rgba(255,255,255,.1)",
+            backdropFilter: "blur(16px)",
+            color: "#f5f0e8",
+            fontSize: 13,
+            fontWeight: 600,
+            textDecoration: "none",
+            boxShadow: "inset 0 1px 0 rgba(255,255,255,.15)",
+          }}
+        >
+          <Icons.CV size={15} /> Download CV
+        </a>
+      )}
+    </header>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   FLOATING NAV
+═══════════════════════════════════════════════════════════════════════════ */
+function FloatingNav({ visible, activeSection, onNavClick }) {
+  const NAV = ["Home", "About", "Skills", "Projects", "Connect"];
+  return (
+    <div
+      className="lg-nav"
+      style={{
+        position: "fixed",
+        bottom: 24,
+        left: "50%",
+        transform: visible
+          ? "translateX(-50%) translateY(0px)"
+          : "translateX(-50%) translateY(90px)",
+        opacity: visible ? 1 : 0,
+        pointerEvents: visible ? "auto" : "none",
+        zIndex: 500,
+        display: "flex",
+        alignItems: "center",
+        gap: 2,
+        padding: "5px 6px",
+        borderRadius: 50,
+        background:
+          "linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.04) 50%, rgba(242,101,34,0.08) 100%)",
+        backdropFilter: "blur(40px) saturate(280%) brightness(1.1)",
+        WebkitBackdropFilter: "blur(40px) saturate(280%) brightness(1.1)",
+        border: "1px solid rgba(255,255,255,0.18)",
+        boxShadow: [
+          "0 0 0 1px rgba(242,101,34,.35)",
+          "0 8px 40px rgba(0,0,0,.6)",
+          "0 0 60px rgba(242,101,34,.1)",
+          "inset 0 1px 0 rgba(255,255,255,.25)",
+          "inset 0 -1px 0 rgba(0,0,0,.2)",
+          "inset 1px 0 0 rgba(255,255,255,.1)",
+          "inset -1px 0 0 rgba(255,255,255,.1)",
+        ].join(","),
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: "15%",
+          right: "15%",
+          height: 1,
+          background:
+            "linear-gradient(90deg,transparent,rgba(255,255,255,.55),rgba(242,101,34,.5),transparent)",
+          borderRadius: "0 0 4px 4px",
+          pointerEvents: "none",
+        }}
+      />
+      {NAV.map((item) => {
+        const isActive = activeSection === item;
+        return (
+          <a
+            key={item}
+            href={"#" + item.toLowerCase()}
+            onClick={() => onNavClick(item)}
+            className={`lg-nav-link${isActive ? " lg-active" : ""}`}
+            style={{ color: isActive ? "#fff" : "rgba(255,255,255,.55)" }}
+          >
+            {item}
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DUAL NAVBAR CONTROLLER
+═══════════════════════════════════════════════════════════════════════════ */
+function DualNavbar({ cvUrl }) {
+  const [pastHero, setPastHero] = useState(false);
+  const [activeSection, setActiveSection] = useState("Home");
+  const NAV = ["Home", "About", "Skills", "Projects", "Connect"];
+
+  useEffect(() => {
+    const handler = () => setPastHero(window.scrollY > 80);
+    window.addEventListener("scroll", handler, { passive: true });
+    handler();
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = NAV.map((n) =>
+        document.getElementById(n.toLowerCase()),
+      ).filter(Boolean);
+      let current = "Home";
+      sections.forEach((section) => {
+        const rect = section.getBoundingClientRect();
+        if (
+          rect.top <= window.innerHeight / 2 &&
+          rect.bottom >= window.innerHeight / 2
+        ) {
+          current = section.id;
+        }
+      });
+      setActiveSection(current.charAt(0).toUpperCase() + current.slice(1));
+    };
+    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleNavClick = useCallback((item) => setActiveSection(item), []);
+
+  return (
+    <>
+      <HeroNav
+        visible={!pastHero}
+        activeSection={activeSection}
+        onNavClick={handleNavClick}
+        cvUrl={cvUrl}
+      />
+      <FloatingNav
+        visible={pastHero}
+        activeSection={activeSection}
+        onNavClick={handleNavClick}
+      />
+    </>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ABOUT SECTION
+═══════════════════════════════════════════════════════════════════════════ */
 function AboutSection() {
   const sectionRef = useRef(null);
+  const O = "#f26522",
+    BG = "#160b00",
+    FG = "#f5f0e8";
 
   useEffect(() => {
     const sec = sectionRef.current;
     if (!sec) return;
-
-    // Scroll reveal
-    const revObs = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e, i) => {
+    const obs = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
           if (e.isIntersecting) {
-            e.target.style.transitionDelay = `${i * 0.08}s`;
-            e.target.classList.add("ab-vis");
-            revObs.unobserve(e.target);
+            e.target.style.opacity = "1";
+            e.target.style.transform = "translateY(0)";
+            obs.unobserve(e.target);
           }
-        });
-      },
+        }),
       { threshold: 0.08 },
     );
-    sec.querySelectorAll(".ab-reveal").forEach((el) => revObs.observe(el));
-
-    // Chips stagger
-    sec.querySelectorAll(".ab-chip-inner").forEach((c, i) => {
-      c.style.animationName = "ab-chipIn";
-      c.style.animationDuration = "0.4s";
-      c.style.animationTimingFunction = "cubic-bezier(.34,1.56,.64,1)";
-      c.style.animationFillMode = "both";
-      c.style.animationDelay = `${0.55 + i * 0.05}s`;
+    sec.querySelectorAll(".ab-animate").forEach((el, i) => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(24px)";
+      el.style.transition = `opacity .65s cubic-bezier(.22,1,.36,1) ${i * 0.1}s, transform .65s cubic-bezier(.22,1,.36,1) ${i * 0.1}s`;
+      obs.observe(el);
     });
-
-    return () => revObs.disconnect();
+    return () => obs.disconnect();
   }, []);
 
-  const chips = [
-    "LangChain",
-    "OpenAI",
-    "Gemini",
-    "HuggingFace",
-    "Ollama",
-    "FAISS",
-    "ChromaDB",
-    "FastAPI",
-    "React",
-    "Node.js",
-    "MongoDB",
-    "Docker",
-    "Python",
+  // Replaced "My Journey" with "What I Bring" — a value-focused tab
+  const valueProps = [
+    {
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+      ),
+      label: "Speed to Production",
+      detail:
+        "From idea to deployed product. I don't get stuck in theory — I ship.",
+    },
+    {
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M12 8v4l3 3" />
+        </svg>
+      ),
+      label: "Self-Taught & Self-Driven",
+      detail:
+        "No bootcamp, no hand-holding. Built every project by figuring things out from scratch.",
+    },
+    {
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+        </svg>
+      ),
+      label: "End-to-End Ownership",
+      detail:
+        "I own every layer — LLM, backend, frontend, deployment. No gaps, no handoffs.",
+    },
+    {
+      icon: (
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M9 11l3 3L22 4" />
+          <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+        </svg>
+      ),
+      label: "Real-World Focus",
+      detail:
+        "Every project I build is designed to solve a genuine problem, not just demo on localhost.",
+    },
   ];
 
-  const cards = [
+  // Replaced strength cards with clearer, sharper content
+  const strengths = [
     {
-      num: "01",
-      title: "Generative AI with LangChain",
-      icon: <AbIconChat />,
-      body: "I use LangChain to connect LLMs to real data — documents, APIs, YouTube transcripts. I build RAG pipelines where the AI reads your actual content before answering, so responses are grounded, not guessed.",
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M3 3h6l2 9-3 2s1.5 3 4 3 4-3 4-3l-3-2 2-9h6" />
+          <path d="M5 17c0 2 3.5 4 7 4s7-2 7-4" />
+        </svg>
+      ),
+      title: "Prioritise What Matters",
+      desc: "I work by impact, not by urgency. The feature that unblocks users ships first; the cosmetic polish waits. This keeps projects moving and stakeholders happy.",
     },
     {
-      num: "02",
-      title: "Full-Stack Development",
-      icon: <AbIconMonitor />,
-      body: "React for the UI, FastAPI or Node.js for the backend, MongoDB for data. I handle auth, APIs, and deployment — so the AI layer lives inside a complete, polished product anyone can use.",
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="M21 21l-4.35-4.35" />
+          <path d="M11 8v3l2 2" />
+        </svg>
+      ),
+      title: "Debug Like a Detective",
+      desc: "When something breaks, I trace it to the root cause — not the symptom. I read logs, reproduce bugs methodically, and fix the actual problem, not just the error message.",
     },
     {
-      num: "03",
-      title: "Smart Search & Retrieval",
-      icon: <AbIconSearch />,
-      body: "Vector databases like FAISS and ChromaDB store content as searchable numbers. I design these search systems so when you ask a question, the AI finds the right piece of information — fast and accurately.",
+      icon: (
+        <svg
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#f26522"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+        </svg>
+      ),
+      title: "Learn Fast, Apply Faster",
+      desc: "LangGraph, FAISS, tool-calling, multi-turn memory — I picked each up in days by building something real with it. I don't learn a skill in isolation; I learn it by shipping it.",
     },
   ];
-
-  const traits = [
-    {
-      title: "I read the docs, then break things",
-      icon: <AbIconShield />,
-      body: "Before I build, I understand. I read how the tool works, then push it until it breaks — because that's where you learn what it actually does.",
-    },
-    {
-      title: "I understand what I build",
-      icon: <AbIconInfo />,
-      body: "When something breaks, I want to know why — not just restart it. I dig into the retrieval pipeline, the token count, the model call — until I find the actual cause.",
-    },
-    {
-      title: "I build for real users",
-      icon: <AbIconUsers />,
-      body: "Every feature has to make sense to someone who doesn't care what vector database I used. Good software is invisible — users just feel like it works.",
-    },
-    {
-      title: "Always learning",
-      icon: <AbIconActivity />,
-      body: "New model released? New framework dropped? I want to try it, break it, and figure out if it changes what I'm building. Staying current isn't optional in this field.",
-    },
-  ];
-
-  const O = "#f26522";
-  const BG = "#160b00";
-  const FG = "#f5f0e8";
 
   return (
     <section
       id="about"
       ref={sectionRef}
-      className="ab-section"
       style={{
         background: BG,
         color: FG,
-        fontFamily: "'Instrument Sans','DM Sans',sans-serif",
-        padding: "90px 56px",
+        fontFamily: "'DM Sans',sans-serif",
+        padding: "96px 56px",
         position: "relative",
         overflow: "hidden",
       }}
     >
-      {/* Animated glow orbs */}
+      {/* Ambient orbs */}
       {[
-        {
-          w: 560,
-          h: 560,
-          top: -110,
-          right: -90,
-          op: 0.1,
-          anim: "ab-glowFloat 8s ease-in-out infinite",
-          delay: "-2s",
-        },
-        {
-          w: 380,
-          h: 380,
-          bottom: 40,
-          left: -70,
-          op: 0.07,
-          anim: "ab-glowFloat 11s ease-in-out infinite",
-          delay: "-5s",
-        },
-        {
-          w: 220,
-          h: 220,
-          top: "55%",
-          left: "42%",
-          op: 0.05,
-          anim: "ab-orbDrift 14s ease-in-out infinite",
-          delay: "0s",
-        },
+        { w: 500, h: 500, top: -100, right: -80, op: 0.1, dur: "9s" },
+        { w: 340, h: 340, bottom: 60, left: -60, op: 0.07, dur: "12s" },
       ].map((g, i) => (
         <div
           key={i}
@@ -1217,39 +1405,10 @@ function AboutSection() {
             bottom: g.bottom,
             left: g.left,
             background: `radial-gradient(circle,rgba(242,101,34,${g.op}) 0%,transparent 65%)`,
-            animation: g.anim,
-            animationDelay: g.delay,
+            animation: `abGlowFloat ${g.dur} ease-in-out infinite`,
           }}
         />
       ))}
-
-      {/* Noise texture */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 0,
-          opacity: 0.025,
-          backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          backgroundRepeat: "repeat",
-        }}
-      />
-
-      {/* Scan line */}
-      <div
-        style={{
-          position: "absolute",
-          left: 0,
-          right: 0,
-          height: 2,
-          background:
-            "linear-gradient(90deg,transparent,rgba(242,101,34,0.13),transparent)",
-          pointerEvents: "none",
-          animation: "ab-scanLine 8s linear infinite",
-          zIndex: 0,
-        }}
-      />
 
       <div
         style={{
@@ -1259,615 +1418,298 @@ function AboutSection() {
           zIndex: 1,
         }}
       >
-        {/* ── TOP ROW ── */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            justifyContent: "space-between",
-            gap: 36,
-            marginBottom: 64,
-          }}
-        >
-          {/* Name block */}
+        {/* Header */}
+        <div className="ab-animate" style={{ marginBottom: 56 }}>
           <div
             style={{
-              animation: "ab-fadeUp .75s cubic-bezier(.22,1,.36,1) both",
-              animationDelay: ".15s",
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: "0.22em",
+              textTransform: "uppercase",
+              color: O,
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              marginBottom: 16,
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 28,
+                height: 1,
+                background: O,
+              }}
+            />
+            About me
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-end",
+              gap: 32,
+              flexWrap: "wrap",
             }}
           >
             <div
               style={{
-                fontSize: 10.5,
-                fontWeight: 600,
-                letterSpacing: "0.22em",
-                textTransform: "uppercase",
-                color: O,
-                display: "flex",
-                alignItems: "center",
-                gap: 10,
-                marginBottom: 22,
-                animation: "ab-fadeRight .7s ease both",
-                animationDelay: ".1s",
-              }}
-            >
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 28,
-                  height: 1,
-                  background: O,
-                  flexShrink: 0,
-                  transformOrigin: "left",
-                  animation: "ab-lineGrow .6s ease both",
-                  animationDelay: ".05s",
-                }}
-              />
-              About me
-            </div>
-            {/* ← FIXED font size: was clamp(52px,7vw,96px) → now clamp(36px,4.6vw,56px) */}
-            <div
-              style={{
-                fontFamily: "'Clash Display', 'Satoshi', sans-serif",
-                fontSize: "clamp(56px, 6.5vw, 92px)",
-                fontWeight: 1000,
+                fontFamily: "'Outfit',sans-serif",
+                fontSize: "clamp(52px,6vw,86px)",
+                fontWeight: 900,
                 lineHeight: 1.05,
                 letterSpacing: "-0.02em",
               }}
             >
-              <div>Aditya</div>
-              <div
+              <span style={{ color: FG }}>Aditya</span>{" "}
+              <span
                 style={{
-                  WebkitTextStroke: "1.5px rgba(242,101,34,0.4)",
+                  WebkitTextStroke: "1.5px rgba(242,101,34,.45)",
                   color: "transparent",
-                  transition: "color .4s,-webkit-text-stroke .4s",
-                  cursor: "default",
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.color = "rgba(242,101,34,0.15)";
-                  e.target.style.WebkitTextStroke = `1.5px ${O}`;
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.color = "transparent";
-                  e.target.style.WebkitTextStroke =
-                    "1.5px rgba(242,101,34,0.4)";
                 }}
               >
                 Soran
-              </div>
-              <div style={{ color: O }}>—</div>
+              </span>
+            </div>
+            <div style={{ paddingBottom: 10, flex: "0 0 380px" }}>
+              <p style={{ fontSize: 14.5, lineHeight: 1.85, color: "#907060" }}>
+                <strong style={{ color: "#d4a080", fontWeight: 500 }}>
+                  AI Developer
+                </strong>{" "}
+                focused on building complete, production-ready products {"->"}{" "}
+                from the LLM layer to the user interface.
+              </p>
             </div>
           </div>
+        </div>
 
-          {/* Intro */}
+        {/* Two-column: Story + What I Bring */}
+        <div
+          className="ab-animate"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1.1fr 0.9fr",
+            gap: 20,
+            marginBottom: 20,
+          }}
+        >
+          {/* Story / Bio card */}
           <div
+            className="ab-info-card"
             style={{
-              flex: "0 0 380px",
-              paddingTop: 14,
-              animation: "ab-fadeLeft .75s cubic-bezier(.22,1,.36,1) both",
-              animationDelay: ".25s",
+              background: "rgba(255,255,255,.02)",
+              border: "1px solid rgba(242,101,34,.12)",
+              borderRadius: 20,
+              padding: "36px 32px",
+              position: "relative",
+              overflow: "hidden",
             }}
           >
-            <p
+            <div
               style={{
-                fontSize: 14.5,
-                lineHeight: 1.9,
-                color: "#907060",
-                marginBottom: 12,
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                background: `linear-gradient(90deg,${O},transparent)`,
+              }}
+            />
+            <div
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: O,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                marginBottom: 20,
               }}
             >
-              I'm an{" "}
-              <strong style={{ color: "#d4a080", fontWeight: 500 }}>
-                AI & Full Stack Developer
-              </strong>{" "}
-              who builds complete, production-ready products — from the AI layer
-              all the way to the user interface. I use{" "}
-              <strong style={{ color: "#d4a080", fontWeight: 500 }}>
-                LangChain, OpenAI, and vector databases
-              </strong>{" "}
-              to make applications that are genuinely intelligent, not just
-              connected to an API.
+              Who I am
+            </div>
+            <p
+              style={{
+                fontSize: 15,
+                color: "#c0a090",
+                lineHeight: 1.9,
+                marginBottom: 18,
+              }}
+            >
+              I'm a self-taught developer who got obsessed with AI when I
+              realised LLMs weren't just chatbots — they were{" "}
+              <span style={{ color: FG, fontWeight: 600 }}>
+                platforms for building entirely new kinds of software
+              </span>
+              .
             </p>
-            <p style={{ fontSize: 14.5, lineHeight: 1.9, color: "#907060" }}>
-              On the full-stack side, I work across{" "}
-              <strong style={{ color: "#d4a080", fontWeight: 500 }}>
-                React, FastAPI, Node.js, and MongoDB
-              </strong>{" "}
-              — handling everything from backend logic and authentication to
-              deployment.
+            <p
+              style={{
+                fontSize: 14,
+                color: "#907060",
+                lineHeight: 1.85,
+                marginBottom: 18,
+              }}
+            >
+              Over the past two years I've gone deep on RAG pipelines, agentic
+              workflows, and full-stack MERN products — always with the goal of
+              shipping something a real user can actually open and use.
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                color: "#907060",
+                lineHeight: 1.85,
+                marginBottom: 24,
+              }}
+            >
+              I don't separate "AI developer" from "full-stack developer". To
+              me, a good AI product needs a real backend, a real frontend, and a
+              real user experience — not just a Colab notebook.
             </p>
             <div
-              className="ab-badge"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 10,
-                marginTop: 22,
-                padding: "9px 16px",
-                border: "1px solid rgba(242,101,34,0.22)",
-                background: "rgba(242,101,34,0.05)",
-                position: "relative",
-                overflow: "hidden",
-                transition: "border-color .3s, background .3s",
-                cursor: "default",
+                gap: 8,
+                padding: "8px 18px",
+                borderRadius: 50,
+                border: "1px solid rgba(242,101,34,.22)",
+                background: "rgba(242,101,34,.05)",
               }}
             >
               <div
                 style={{
-                  width: 5,
-                  height: 5,
+                  width: 7,
+                  height: 7,
                   borderRadius: "50%",
-                  background: O,
-                  opacity: 0.5,
-                  animation: "ab-pulseDot 2.4s ease-in-out infinite",
+                  background: "#22c55e",
+                  boxShadow: "0 0 10px #22c55e",
+                  animation: "fadeUp 2s ease-in-out infinite",
                 }}
               />
               <span
                 style={{
-                  fontFamily: "'Syne','Plus Jakarta Sans',sans-serif",
-                  fontSize: 11,
+                  fontFamily: "'Outfit',sans-serif",
+                  fontSize: 11.5,
                   fontWeight: 700,
+                  color: O,
                   letterSpacing: "0.08em",
                   textTransform: "uppercase",
-                  color: O,
                 }}
               >
-                AI & Full Stack Developer
+                Open to Work — AI Development Roles
               </span>
-              <div
-                style={{
-                  width: 5,
-                  height: 5,
-                  borderRadius: "50%",
-                  background: O,
-                  opacity: 0.5,
-                  animation: "ab-pulseDot 2.4s ease-in-out infinite",
-                  animationDelay: ".6s",
-                }}
-              />
             </div>
           </div>
-        </div>
 
-        {/* ── DIVIDER ── */}
-        <div
-          className="ab-divider ab-reveal"
-          style={{
-            width: "100%",
-            height: 1,
-            background:
-              "linear-gradient(90deg,rgba(242,101,34,0.28),rgba(242,101,34,0.05) 60%,transparent)",
-            marginBottom: 52,
-            transformOrigin: "left",
-            animation: "ab-lineGrow 1s cubic-bezier(.22,1,.36,1) both",
-            animationDelay: ".4s",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        />
-
-        {/* ── THREE CARDS ── */}
-        <div
-          className="ab-reveal"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr 1fr",
-            gap: 1,
-            background: "rgba(242,101,34,0.1)",
-            marginBottom: 56,
-          }}
-        >
-          {cards.map((card) => (
+          {/* What I Bring card — replaces My Journey */}
+          <div
+            className="ab-info-card"
+            style={{
+              background: "rgba(255,255,255,.02)",
+              border: "1px solid rgba(242,101,34,.12)",
+              borderRadius: 20,
+              padding: "36px 28px",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
             <div
-              key={card.num}
-              className="ab-card"
               style={{
-                background: BG,
-                padding: "34px 26px",
-                position: "relative",
-                overflow: "hidden",
-                transition: "background .35s",
-                cursor: "default",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                height: 2,
+                background: `linear-gradient(90deg,transparent,${O},transparent)`,
               }}
-            >
-              <div
-                className="ab-card-num"
-                style={{
-                  fontFamily: "'Syne','Plus Jakarta Sans',sans-serif",
-                  fontSize: 11,
-                  fontWeight: 800,
-                  color: "rgba(242,101,34,0.28)",
-                  letterSpacing: "0.1em",
-                  marginBottom: 16,
-                  transition: "color .3s",
-                }}
-              >
-                {card.num}
-              </div>
-              <div
-                className="ab-card-icon"
-                style={{
-                  width: 36,
-                  height: 36,
-                  border: "1px solid rgba(242,101,34,0.18)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: O,
-                  marginBottom: 14,
-                  transition:
-                    "border-color .3s, transform .35s cubic-bezier(.34,1.56,.64,1), box-shadow .35s",
-                }}
-              >
-                {card.icon}
-              </div>
-              <div
-                className="ab-card-title"
-                style={{
-                  fontFamily: "'Syne','Plus Jakarta Sans',sans-serif",
-                  fontSize: 14.5,
-                  fontWeight: 700,
-                  color: FG,
-                  letterSpacing: "-0.01em",
-                  marginBottom: 9,
-                  lineHeight: 1.3,
-                  transition: "color .3s",
-                }}
-              >
-                {card.title}
-              </div>
-              <div
-                className="ab-card-body"
-                style={{
-                  fontSize: 12.5,
-                  color: "#705040",
-                  lineHeight: 1.82,
-                  transition: "color .3s",
-                }}
-              >
-                {card.body}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── BOTTOM ROW ── */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1.1fr 0.9fr",
-            gap: 52,
-            alignItems: "start",
-          }}
-        >
-          {/* Left */}
-          <div className="ab-left-col ab-reveal">
+            />
             <div
               style={{
-                fontSize: 10,
-                fontWeight: 500,
-                letterSpacing: "0.2em",
-                textTransform: "uppercase",
-                color: "rgba(242,101,34,0.4)",
-                marginBottom: 20,
-              }}
-            >
-              How I think
-            </div>
-            <div
-              className="ab-quote"
-              style={{
-                fontFamily: "'Syne','Plus Jakarta Sans',sans-serif",
-                fontSize: "clamp(15px,1.5vw,20px)",
+                fontSize: 11,
                 fontWeight: 700,
-                lineHeight: 1.48,
-                color: FG,
-                position: "relative",
-                paddingLeft: 20,
-                marginBottom: 20,
-                borderLeft: `3px solid ${O}`,
+                color: O,
+                letterSpacing: "0.14em",
+                textTransform: "uppercase",
+                marginBottom: 24,
               }}
             >
-              "I want to build AI that solves something real — not just a cool
-              demo that nobody uses twice."
+              What I Bring
             </div>
-            <p
-              style={{
-                fontSize: 13.5,
-                color: "#806050",
-                lineHeight: 1.9,
-                paddingLeft: 20,
-                marginBottom: 12,
-              }}
-            >
-              I became an AI & Full Stack Developer because I wanted to build
-              things that genuinely help people. That meant learning how to feed
-              LLMs the right context, how to stop them giving wrong answers, and
-              how to make the whole experience feel effortless to someone who
-              doesn't care about the tech underneath.
-            </p>
-            <p
-              style={{
-                fontSize: 13.5,
-                color: "#806050",
-                lineHeight: 1.9,
-                paddingLeft: 20,
-              }}
-            >
-              Every project I've built comes from a real problem — a hackathon
-              brief, a need to chat with any YouTube video, a way to break down
-              dense research papers. Real problems push you to learn fast and
-              ship things that actually work.
-            </p>
-            {/* Chips */}
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 7,
-                marginTop: 32,
-                paddingTop: 32,
-                borderTop: "1px solid rgba(242,101,34,0.1)",
-              }}
-            >
-              {chips.map((chip) => (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {valueProps.map((item, i) => (
                 <div
-                  key={chip}
-                  className="ab-chip-inner"
+                  key={i}
                   style={{
-                    fontSize: 10.5,
-                    letterSpacing: "0.06em",
-                    textTransform: "uppercase",
-                    color: "#805040",
-                    border: "1px solid rgba(242,101,34,0.15)",
-                    padding: "5px 13px",
-                    fontWeight: 500,
-                    position: "relative",
-                    overflow: "hidden",
-                    transition:
-                      "color .25s, border-color .25s, background .25s, transform .25s",
-                    cursor: "default",
+                    display: "flex",
+                    gap: 14,
+                    alignItems: "flex-start",
+                    padding: "14px 16px",
+                    borderRadius: 12,
+                    background: "rgba(242,101,34,.03)",
+                    border: "1px solid rgba(242,101,34,.08)",
                   }}
                 >
-                  {chip}
+                  <div
+                    style={{
+                      flexShrink: 0,
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: "rgba(242,101,34,.08)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      border: "1px solid rgba(242,101,34,.15)",
+                    }}
+                  >
+                    {item.icon}
+                  </div>
+                  <div>
+                    <div
+                      style={{
+                        fontFamily: "'Outfit',sans-serif",
+                        fontSize: 13.5,
+                        fontWeight: 700,
+                        color: FG,
+                        marginBottom: 3,
+                      }}
+                    >
+                      {item.label}
+                    </div>
+                    <p
+                      style={{
+                        fontSize: 12,
+                        color: "#705040",
+                        lineHeight: 1.65,
+                      }}
+                    >
+                      {item.detail}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
-
-          {/* Right — traits */}
-          <div
-            className="ab-reveal"
-            style={{ display: "flex", flexDirection: "column" }}
-          >
-            {traits.map((trait, i) => (
-              <div
-                key={i}
-                className="ab-trait"
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 16,
-                  padding: "18px 0",
-                  borderBottom:
-                    i < traits.length - 1
-                      ? "1px solid rgba(242,101,34,0.07)"
-                      : "none",
-                  position: "relative",
-                  overflow: "hidden",
-                  transition: "background .3s",
-                  borderRadius: 2,
-                }}
-              >
-                <div
-                  className="ab-trait-icon"
-                  style={{
-                    width: 32,
-                    height: 32,
-                    border: "1px solid rgba(242,101,34,0.2)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    color: O,
-                    transition:
-                      "border-color .3s, background .3s, transform .3s cubic-bezier(.34,1.56,.64,1)",
-                  }}
-                >
-                  {trait.icon}
-                </div>
-                <div>
-                  <div
-                    className="ab-trait-title"
-                    style={{
-                      fontFamily: "'Syne','Plus Jakarta Sans',sans-serif",
-                      fontSize: 12.5,
-                      fontWeight: 700,
-                      color: FG,
-                      marginBottom: 4,
-                      transition: "color .3s",
-                    }}
-                  >
-                    {trait.title}
-                  </div>
-                  <div
-                    className="ab-trait-body"
-                    style={{
-                      fontSize: 12,
-                      color: "#705040",
-                      lineHeight: 1.68,
-                      transition: "color .3s",
-                    }}
-                  >
-                    {trait.body}
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
-      </div>
-    </section>
-  );
-}
 
-/* ─────────────────────────────────────────────
-   SKILLS SECTION
-───────────────────────────────────────────── */
-function SkillsSection() {
-  const categories = [
-    {
-      title: "Frontend",
-      Icon: Icons.Monitor,
-      headerColor: "#61DAFB",
-      skills: [
-        { name: "React.js", color: "#61DAFB", bg: "#001c24" },
-        { name: "JavaScript", color: "#F7DF1E", bg: "#1a1500" },
-        { name: "HTML5", color: "#E34F26", bg: "#1a0800" },
-        { name: "TailwindCSS", color: "#38BDF8", bg: "#001518" },
-        { name: "Redux", color: "#764ABC", bg: "#0d0518" },
-        { name: "React Router", color: "#CA4245", bg: "#1a0505" },
-        { name: "React Hook Form", color: "#EC5990", bg: "#1a0510" },
-        { name: "Chart.js", color: "#FF6384", bg: "#1a0308" },
-      ],
-    },
-    {
-      title: "Backend & APIs",
-      Icon: Icons.Server,
-      headerColor: "#68D391",
-      skills: [
-        { name: "Node.js", color: "#68D391", bg: "#041204" },
-        { name: "Express.js", color: "#a0a0a0", bg: "#141414" },
-        { name: "FastAPI", color: "#009688", bg: "#001512" },
-        { name: "Python", color: "#FFD43B", bg: "#1a1200" },
-        { name: "Socket.io", color: "#e0e0e0", bg: "#111" },
-        { name: "EJS", color: "#B4CA65", bg: "#0e1400" },
-        { name: "Pydantic", color: "#E92063", bg: "#1a0010" },
-        { name: "REST APIs", color: "#FF9500", bg: "#1a0e00" },
-        { name: "JWT Auth", color: "#D63AFF", bg: "#120520" },
-      ],
-    },
-    {
-      title: "Databases",
-      Icon: Icons.Database,
-      headerColor: "#F6AD55",
-      skills: [
-        { name: "MongoDB", color: "#47A248", bg: "#041204" },
-        { name: "MySQL", color: "#4479A1", bg: "#040c1a" },
-        { name: "Vector Databases", color: "#FF6B6B", bg: "#1a0505" },
-        { name: "ChromaDB", color: "#7C3AED", bg: "#09051a" },
-        { name: "FAISS", color: "#818CF8", bg: "#08091a" },
-      ],
-    },
-    {
-      title: "Generative AI & LLMs",
-      Icon: Icons.Cpu,
-      headerColor: "#A78BFA",
-      skills: [
-        { name: "Generative AI", color: "#A78BFA", bg: "#0d0520" },
-        { name: "LangChain", color: "#00D084", bg: "#001a10" },
-        { name: "OpenAI Models", color: "#e0e0e0", bg: "#111" },
-        { name: "OpenAI Embeddings", color: "#74AA9C", bg: "#051210" },
-        { name: "Agentic AI", color: "#F59E0B", bg: "#1a1000" },
-        { name: "LLMs", color: "#6EE7B7", bg: "#041510" },
-        { name: "RAG Systems", color: "#818CF8", bg: "#0a0b1a" },
-        { name: "HuggingFace", color: "#FFD21E", bg: "#1a1500" },
-        { name: "Ollama", color: "#e0e0e0", bg: "#111" },
-        { name: "Open Source Models", color: "#34D399", bg: "#041510" },
-        { name: "Closed Source Models", color: "#F87171", bg: "#1a0505" },
-        { name: "Prompt Engineering", color: "#FCA5A5", bg: "#1a0808" },
-        { name: "Gemini", color: "#4285F4", bg: "#040c1a" },
-      ],
-    },
-    {
-      title: "DevOps & Tools",
-      Icon: Icons.Wrench,
-      headerColor: "#F97316",
-      skills: [
-        { name: "Git", color: "#F05032", bg: "#1a0800" },
-        { name: "GitHub", color: "#e0e0e0", bg: "#111" },
-        { name: "Docker", color: "#2496ED", bg: "#041018" },
-        { name: "Vercel", color: "#e0e0e0", bg: "#111" },
-        { name: "Render", color: "#46E3B7", bg: "#041510" },
-        { name: "NPM", color: "#CB3837", bg: "#1a0505" },
-        { name: "PowerShell", color: "#5391FE", bg: "#040c1a" },
-        { name: "DSA", color: "#FF9500", bg: "#1a0e00" },
-        { name: "OOPs", color: "#34D399", bg: "#041510" },
-        { name: "DBMS", color: "#F6AD55", bg: "#1a1000" },
-      ],
-    },
-  ];
-
-  return (
-    <section
-      id="skills"
-      style={{
-        padding: "96px 52px",
-        background: "rgba(10,4,0,0.55)",
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        style={{
-          position: "absolute",
-          top: "10%",
-          left: "0%",
-          width: 400,
-          height: 400,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(242,101,34,0.05) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div
-        style={{
-          position: "absolute",
-          bottom: "5%",
-          right: "0%",
-          width: 300,
-          height: 300,
-          borderRadius: "50%",
-          background:
-            "radial-gradient(circle, rgba(97,218,251,0.04) 0%, transparent 70%)",
-          pointerEvents: "none",
-        }}
-      />
-      <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-        <p
+        {/* Strengths row — clearer content */}
+        <div
+          className="ab-animate"
           style={{
-            color: "#f26522",
-            fontSize: 12,
-            fontWeight: 700,
-            letterSpacing: "0.16em",
-            textTransform: "uppercase",
-            marginBottom: 6,
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr 1fr",
+            gap: 16,
           }}
         >
-          What I bring
-        </p>
-        <h2
-          style={{
-            fontFamily: "Plus Jakarta Sans,sans-serif",
-            fontSize: 42,
-            fontWeight: 800,
-            letterSpacing: "-0.01em",
-            marginBottom: 52,
-          }}
-        >
-          My <span style={{ color: "#f26522" }}>Skills</span>
-        </h2>
-        <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
-          {categories.map((cat) => (
+          {strengths.map((s, i) => (
             <div
-              key={cat.title}
+              key={s.title}
+              className="ab-info-card"
               style={{
-                background: "rgba(14,5,0,0.7)",
-                border: `1px solid ${cat.headerColor}20`,
-                borderRadius: 22,
-                padding: "28px 28px",
-                backdropFilter: "blur(14px)",
+                background: "rgba(255,255,255,.02)",
+                border: "1px solid rgba(242,101,34,.1)",
+                borderRadius: 18,
+                padding: "26px 24px",
                 position: "relative",
                 overflow: "hidden",
               }}
@@ -1878,112 +1720,41 @@ function SkillsSection() {
                   top: 0,
                   left: 0,
                   right: 0,
-                  height: 2.5,
-                  background: `linear-gradient(90deg,${cat.headerColor},${cat.headerColor}40,transparent)`,
+                  height: 2,
+                  background: `linear-gradient(90deg,${O}${["bb", "80", "50"][i]},transparent)`,
                 }}
               />
               <div
                 style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 13,
+                  background: "rgba(242,101,34,.08)",
+                  border: "1px solid rgba(242,101,34,.18)",
                   display: "flex",
                   alignItems: "center",
-                  gap: 10,
-                  marginBottom: 18,
+                  justifyContent: "center",
+                  marginBottom: 16,
                 }}
               >
-                <div
-                  style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 10,
-                    background: `${cat.headerColor}18`,
-                    border: `1.5px solid ${cat.headerColor}40`,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <cat.Icon size={17} color={cat.headerColor} />
-                </div>
-                <span
-                  style={{
-                    fontFamily: "Plus Jakarta Sans,sans-serif",
-                    fontSize: 15,
-                    fontWeight: 800,
-                    color: "#f5f0e8",
-                  }}
-                >
-                  {cat.title}
-                </span>
-                <div
-                  style={{
-                    flex: 1,
-                    height: 1,
-                    background: `linear-gradient(90deg,${cat.headerColor}30,transparent)`,
-                    marginLeft: 8,
-                  }}
-                />
+                {s.icon}
               </div>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 9 }}>
-                {cat.skills.map(({ name, color, bg }) => (
-                  <div
-                    key={name}
-                    className="skill-badge"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      padding: "7px 16px",
-                      borderRadius: 50,
-                      background: bg,
-                      border: `1.5px solid ${color}50`,
-                      boxShadow: `0 2px 12px ${color}20`,
-                    }}
-                  >
-                    <span
-                      style={{
-                        fontSize: 12,
-                        fontWeight: 700,
-                        color,
-                        letterSpacing: "0.03em",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {name}
-                    </span>
-                  </div>
-                ))}
+              <div
+                style={{
+                  fontFamily: "'Outfit',sans-serif",
+                  fontSize: 16,
+                  fontWeight: 800,
+                  color: FG,
+                  marginBottom: 10,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                {s.title}
               </div>
+              <p style={{ fontSize: 13, color: "#705040", lineHeight: 1.75 }}>
+                {s.desc}
+              </p>
             </div>
-          ))}
-        </div>
-        <div
-          style={{ display: "flex", flexWrap: "wrap", gap: 9, marginTop: 24 }}
-        >
-          {[
-            "OOPs",
-            "DBMS",
-            "JWT",
-            "DSA",
-            "Embeddings",
-            "Semantic Search",
-            "Multimodal AI",
-            "AI Agents",
-          ].map((t, i) => (
-            <span
-              key={t}
-              style={{
-                padding: "6px 15px",
-                borderRadius: 50,
-                fontSize: 12,
-                fontWeight: 500,
-                background: "rgba(242,101,34,0.07)",
-                border: "1px solid rgba(242,101,34,0.18)",
-                color: "#c07040",
-                animation: `skillTagFloat ${2.5 + i * 0.15}s ease-in-out infinite`,
-                animationDelay: `${i * 0.1}s`,
-              }}
-            >
-              {t}
-            </span>
           ))}
         </div>
       </div>
@@ -1991,401 +1762,1423 @@ function SkillsSection() {
   );
 }
 
-/* ─────────────────────────────────────────────
-   PROJECT CARD
-───────────────────────────────────────────── */
-function ProjectCard({
-  title,
-  stack,
-  desc,
-  live,
-  github,
-  tags,
-  bgColor,
-  ProjectIcon,
-  status,
-}) {
+/* ═══════════════════════════════════════════════════════════════════════════
+   SKILLS SECTION — Real icons, sharp copy
+═══════════════════════════════════════════════════════════════════════════ */
+const SKILL_GROUPS = [
+  {
+    id: "genai",
+    label: "Generative AI",
+    color: "#f26522",
+    icon: (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#f26522"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 2a10 10 0 110 20A10 10 0 0112 2z" />
+        <path d="M12 8v4l3 3" />
+        <path d="M8.5 14.5l7-7" />
+      </svg>
+    ),
+    headline: "RAG & LLM Applications",
+    desc: "I build RAG pipelines that retrieve the right context before the LLM ever speaks — so answers are grounded in your actual data, not the model's imagination.",
+    skills: [
+      { name: "RAG Systems", Icon: Icons.VectorDB },
+      { name: "LangChain", Icon: Icons.LangChain },
+      { name: "OpenAI API", Icon: Icons.OpenAI },
+      {
+        name: "Prompt Engineering",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#f26522"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" />
+          </svg>
+        ),
+      },
+      { name: "ChromaDB", Icon: Icons.Chroma },
+      {
+        name: "Text Embeddings",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#f26522"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="2" y="3" width="20" height="4" rx="1" />
+            <rect x="2" y="10" width="14" height="4" rx="1" />
+            <rect x="2" y="17" width="18" height="4" rx="1" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    id: "agentic",
+    label: "Agentic AI",
+    color: "#A78BFA",
+    icon: (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#A78BFA"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" />
+      </svg>
+    ),
+    headline: "AI Agents That Plan & Execute",
+    desc: "I build agents that don't just answer questions — they reason through multi-step goals, call tools when needed, self-correct on failure, and carry context across turns.",
+    skills: [
+      { name: "LangGraph", Icon: Icons.LangGraph },
+      {
+        name: "Tool Calling",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#A78BFA"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Conversation Memory",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#A78BFA"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+          </svg>
+        ),
+      },
+      {
+        name: "ReAct Pattern",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#A78BFA"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+          </svg>
+        ),
+      },
+      {
+        name: "Multi-step Chains",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#A78BFA"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
+          </svg>
+        ),
+      },
+      { name: "OpenAI Assistants", Icon: Icons.OpenAI },
+    ],
+  },
+  {
+    id: "fullstack",
+    label: "Full Stack Dev",
+    color: "#61DAFB",
+    icon: (
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#61DAFB"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="2" y="3" width="20" height="14" rx="2" />
+        <path d="M8 21h8M12 17v4" />
+        <path d="M7 8l-3 2 3 2M17 8l3 2-3 2M13 7l-2 6" />
+      </svg>
+    ),
+    headline: "MERN Apps — Front to Back",
+    desc: "React frontends, Node/FastAPI backends, MongoDB, JWT auth — I build full products that are actually deployed and usable, not just running on localhost.",
+    skills: [
+      { name: "React.js", Icon: Icons.React },
+      { name: "Node.js + Express", Icon: Icons.NodeJS },
+      { name: "FastAPI", Icon: Icons.FastAPI },
+      { name: "MongoDB", Icon: Icons.MongoDB },
+      {
+        name: "REST API Design",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#61DAFB"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M18 20V10M12 20V4M6 20v-6" />
+          </svg>
+        ),
+      },
+      {
+        name: "JWT Auth",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#61DAFB"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <rect x="3" y="11" width="18" height="11" rx="2" />
+            <path d="M7 11V7a5 5 0 0110 0v4" />
+          </svg>
+        ),
+      },
+    ],
+  },
+  {
+    id: "python",
+    label: "Python",
+    color: "#FFD43B",
+    icon: <Icons.Python size={22} />,
+    headline: "Python — My Primary Language",
+    desc: "FastAPI services, async data pipelines, Pydantic validation, AI integrations. Python is the language I reach for first when speed and clarity both matter.",
+    skills: [
+      { name: "Python", Icon: Icons.Python },
+      { name: "FastAPI", Icon: Icons.FastAPI },
+      {
+        name: "Async / Await",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFD43B"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polygon points="5 3 19 12 5 21 5 3" />
+          </svg>
+        ),
+      },
+      {
+        name: "Pydantic",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFD43B"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+        ),
+      },
+      {
+        name: "Data Pipelines",
+        Icon: () => (
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#FFD43B"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+          </svg>
+        ),
+      },
+      { name: "FAISS", Icon: Icons.FAISS },
+    ],
+  },
+];
+
+function SkillChip({ skill, color, delay = 0 }) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setVisible(true);
+          obs.disconnect();
+        }
+      },
+      { threshold: 0.2 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+
+  const { Icon } = skill;
+
   return (
     <div
-      className="proj-card"
+      ref={ref}
+      className="sk-chip"
       style={{
-        background: "rgba(18,8,0,0.95)",
-        border: "1px solid rgba(242,101,34,0.14)",
-        borderRadius: 22,
+        display: "flex",
+        alignItems: "center",
+        gap: 9,
+        padding: "11px 16px",
+        borderRadius: 12,
+        background: visible ? `${color}10` : "transparent",
+        border: `1.5px solid ${color}28`,
+        opacity: visible ? 1 : 0,
+        transform: visible
+          ? "scale(1) translateY(0)"
+          : "scale(.88) translateY(8px)",
+        transition: `opacity .5s ease ${delay}s, transform .5s cubic-bezier(.34,1.56,.64,1) ${delay}s, background .22s ease, border-color .22s ease`,
+        cursor: "default",
+        boxShadow: `0 2px 12px ${color}12`,
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = `${color}20`;
+        e.currentTarget.style.borderColor = `${color}55`;
+        e.currentTarget.style.boxShadow = `0 4px 20px ${color}30`;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = `${color}10`;
+        e.currentTarget.style.borderColor = `${color}28`;
+        e.currentTarget.style.boxShadow = `0 2px 12px ${color}12`;
+      }}
+    >
+      <div style={{ flexShrink: 0, display: "flex", alignItems: "center" }}>
+        <Icon size={20} />
+      </div>
+      <span
+        style={{
+          fontFamily: "'Outfit',sans-serif",
+          fontSize: 13.5,
+          fontWeight: 700,
+          color: "#e8ddd5",
+          letterSpacing: "-0.01em",
+        }}
+      >
+        {skill.name}
+      </span>
+    </div>
+  );
+}
+
+function SkillsSection() {
+  const [activeGroup, setActiveGroup] = useState("genai");
+  const active = SKILL_GROUPS.find((g) => g.id === activeGroup);
+
+  return (
+    <section
+      id="skills"
+      style={{
+        background: "#160b00",
+        color: "#f5f0e8",
+        padding: "96px 56px 100px",
+        position: "relative",
         overflow: "hidden",
-        boxShadow: "0 4px 28px rgba(0,0,0,0.5)",
+        fontFamily: "'DM Sans',sans-serif",
       }}
     >
       <div
         style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          backgroundImage: `repeating-linear-gradient(90deg,rgba(242,101,34,.025) 0px,rgba(242,101,34,.025) 1px,transparent 1px,transparent 72px),repeating-linear-gradient(0deg,rgba(242,101,34,.015) 0px,rgba(242,101,34,.015) 1px,transparent 1px,transparent 60px)`,
+        }}
+      />
+      <div
+        style={{
+          maxWidth: 1080,
+          margin: "0 auto",
           position: "relative",
-          height: 180,
-          background: bgColor || "rgba(28,12,2,0.9)",
-          overflow: "hidden",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
+          zIndex: 2,
         }}
       >
+        {/* Header */}
         <div
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,0,0,0.35)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            backgroundImage:
-              "linear-gradient(rgba(242,101,34,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(242,101,34,0.05) 1px, transparent 1px)",
-            backgroundSize: "30px 30px",
-          }}
-        />
-        <div
-          className="proj-img"
-          style={{
-            position: "relative",
-            zIndex: 2,
-            transition: "transform 0.3s ease",
+            display: "flex",
+            alignItems: "flex-end",
+            justifyContent: "space-between",
+            gap: 24,
+            marginBottom: 56,
           }}
         >
-          {ProjectIcon && (
-            <img
-              src={ProjectIcon}
-              alt={title}
+          <div>
+            <div
               style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                borderRadius: 12,
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                fontSize: 10.5,
+                fontWeight: 700,
+                letterSpacing: "0.22em",
+                textTransform: "uppercase",
+                color: "#f26522",
+                marginBottom: 16,
               }}
-            />
-          )}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 28,
+                  height: 1,
+                  background: "#f26522",
+                }}
+              />
+              Tech Stack
+            </div>
+            <div
+              style={{
+                fontFamily: "'Outfit',sans-serif",
+                fontSize: "clamp(44px,5.5vw,72px)",
+                fontWeight: 900,
+                lineHeight: 1.0,
+                letterSpacing: "-0.03em",
+              }}
+            >
+              <div>Skill</div>
+              <div style={{ color: "#f26522" }}>
+                set<span style={{ color: "rgba(242,101,34,.28)" }}>.</span>
+              </div>
+            </div>
+          </div>
+          <div style={{ flex: "0 0 380px" }}>
+            <p style={{ fontSize: 14.5, color: "#907060", lineHeight: 1.85 }}>
+              Focused on{" "}
+              <strong style={{ color: "#d4a080", fontWeight: 500 }}>
+                AI development
+              </strong>{" "}
+              — from LLM pipelines and RAG systems to production MERN products.
+              Select a domain to explore.
+            </p>
+          </div>
         </div>
+
+        {/* Tab selector */}
         <div
-          className="proj-img-overlay"
           style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(242,101,34,0.08)",
-            opacity: 0,
-            transition: "opacity 0.3s ease",
-            zIndex: 3,
+            display: "flex",
+            gap: 10,
+            marginBottom: 40,
+            flexWrap: "wrap",
           }}
-        />
+        >
+          {SKILL_GROUPS.map((g) => {
+            const isActive = activeGroup === g.id;
+            return (
+              <button
+                key={g.id}
+                onClick={() => setActiveGroup(g.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "10px 20px",
+                  borderRadius: 50,
+                  border: `1.5px solid ${isActive ? g.color : "rgba(242,101,34,.18)"}`,
+                  background: isActive ? `${g.color}18` : "transparent",
+                  color: isActive ? g.color : "#705040",
+                  fontFamily: "'Outfit',sans-serif",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  letterSpacing: "0.02em",
+                  cursor: "pointer",
+                  transition: "all .22s ease",
+                  boxShadow: isActive ? `0 4px 20px ${g.color}28` : "none",
+                }}
+              >
+                <span style={{ display: "flex", alignItems: "center" }}>
+                  {g.icon}
+                </span>
+                <span>{g.label}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Active group */}
+        <div key={activeGroup} style={{ animation: "cardFlip .35s ease both" }}>
+          <div
+            style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}
+          >
+            {/* Left: detail */}
+            <div
+              style={{
+                background: "rgba(255,255,255,.02)",
+                border: `1px solid ${active.color}22`,
+                borderRadius: 20,
+                padding: "36px 32px",
+              }}
+            >
+              <div style={{ position: "relative", marginBottom: 32 }}>
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    height: 2,
+                    background: `linear-gradient(90deg,${active.color},transparent)`,
+                    borderRadius: 2,
+                  }}
+                />
+                <div style={{ paddingTop: 16 }}>
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 12,
+                      background: `${active.color}15`,
+                      border: `1px solid ${active.color}30`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: 14,
+                    }}
+                  >
+                    {active.icon}
+                  </div>
+                  <div
+                    style={{
+                      fontFamily: "'Outfit',sans-serif",
+                      fontSize: 24,
+                      fontWeight: 800,
+                      color: "#f5f0e8",
+                      letterSpacing: "-0.02em",
+                      marginBottom: 6,
+                    }}
+                  >
+                    {active.headline}
+                  </div>
+                  <p
+                    style={{
+                      fontSize: 13.5,
+                      color: "#907060",
+                      lineHeight: 1.75,
+                    }}
+                  >
+                    {active.desc}
+                  </p>
+                </div>
+              </div>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr 1fr",
+                  gap: 10,
+                }}
+              >
+                {active.skills.map((sk, i) => (
+                  <SkillChip
+                    key={sk.name}
+                    skill={sk}
+                    color={active.color}
+                    delay={i * 0.06}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Right: other groups */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {SKILL_GROUPS.filter((g) => g.id !== activeGroup).map((g) => (
+                <div
+                  key={g.id}
+                  className="sk-card"
+                  onClick={() => setActiveGroup(g.id)}
+                  style={{
+                    background: "rgba(255,255,255,.02)",
+                    border: "1px solid rgba(242,101,34,.1)",
+                    borderRadius: 16,
+                    padding: "20px 22px",
+                    cursor: "pointer",
+                    position: "relative",
+                    overflow: "hidden",
+                  }}
+                >
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      height: 2,
+                      background: `linear-gradient(90deg,${g.color},transparent)`,
+                      opacity: 0.5,
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      marginBottom: 10,
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: 38,
+                        height: 38,
+                        borderRadius: 10,
+                        background: `${g.color}12`,
+                        border: `1px solid ${g.color}25`,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {g.icon}
+                    </div>
+                    <div>
+                      <div
+                        style={{
+                          fontFamily: "'Outfit',sans-serif",
+                          fontSize: 15,
+                          fontWeight: 700,
+                          color: "#f5f0e8",
+                        }}
+                      >
+                        {g.label}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: g.color,
+                          fontWeight: 600,
+                          letterSpacing: "0.05em",
+                        }}
+                      >
+                        {g.headline}
+                      </div>
+                    </div>
+                    <div
+                      style={{
+                        marginLeft: "auto",
+                        fontSize: 14,
+                        color: "rgba(242,101,34,.4)",
+                      }}
+                    >
+                      →
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {g.skills.slice(0, 4).map((sk) => (
+                      <span
+                        key={sk.name}
+                        style={{
+                          fontSize: 10,
+                          padding: "3px 9px",
+                          borderRadius: 6,
+                          background: `${g.color}12`,
+                          color: g.color,
+                          fontWeight: 600,
+                          border: `1px solid ${g.color}22`,
+                        }}
+                      >
+                        {sk.name}
+                      </span>
+                    ))}
+                    <span
+                      style={{
+                        fontSize: 10,
+                        padding: "3px 8px",
+                        borderRadius: 6,
+                        background: "rgba(242,101,34,.04)",
+                        color: "rgba(242,101,34,.4)",
+                        fontWeight: 600,
+                        border: "1px solid rgba(242,101,34,.1)",
+                      }}
+                    >
+                      +{g.skills.length - 4} more
+                    </span>
+                  </div>
+                </div>
+              ))}
+
+              {/* DevOps mini card */}
+              <div
+                style={{
+                  background: "rgba(255,255,255,.02)",
+                  border: "1px solid rgba(242,101,34,.1)",
+                  borderRadius: 16,
+                  padding: "20px 22px",
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 10,
+                    marginBottom: 12,
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 38,
+                      height: 38,
+                      borderRadius: 10,
+                      background: "rgba(249,115,22,.08)",
+                      border: "1px solid rgba(249,115,22,.2)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Icons.Docker size={22} />
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      fontWeight: 700,
+                      color: "#F97316",
+                      letterSpacing: "0.12em",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    DevOps & Tools
+                  </div>
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 7 }}>
+                  {[
+                    { name: "Docker", Icon: Icons.Docker },
+                    { name: "Git / GitHub", Icon: Icons.Git },
+                    { name: "Vercel", Icon: Icons.Vercel },
+                    { name: "Postman", Icon: Icons.Postman },
+                    { name: "Ollama", Icon: Icons.Ollama },
+                    { name: "HuggingFace", Icon: Icons.HuggingFace },
+                  ].map(({ name, Icon }) => (
+                    <span
+                      key={name}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 5,
+                        fontSize: 11,
+                        padding: "5px 10px",
+                        borderRadius: 8,
+                        background: "rgba(249,115,22,.08)",
+                        color: "#F97316",
+                        fontWeight: 600,
+                        border: "1px solid rgba(249,115,22,.2)",
+                      }}
+                    >
+                      <Icon size={14} />
+                      {name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   PROJECTS SECTION
+═══════════════════════════════════════════════════════════════════════════ */
+const PROJECTS = [
+  {
+    number: "01",
+    title: "AyurSutra",
+    accentColor: "#34D399",
+    tags: ["Full Stack", "AI", "NLP"],
+    stack: "MERN · FastAPI · NLP · Sentiment Analysis · JWT",
+    desc: "Full-stack Ayurveda therapy booking platform with role-based access, auto-scheduling, and AI-powered 3-class sentiment NLP — built for Ministry of AYUSH.",
+    live: "https://ayur-sutra-coral.vercel.app/",
+    github: "https://github.com/adityasoran0698",
+    status: "Live",
+  },
+  {
+    number: "02",
+    title: "CuraLink",
+    accentColor: "#2E86AB",
+    tags: ["Medical AI", "RAG", "Agentic AI", "OpenAI"],
+    stack:
+      "Python · LangChain · gpt-4o-mini · OpenAI Embeddings · FastAPI · React",
+    desc: "AI Medical Research Assistant that queries PubMed, OpenAlex & ClinicalTrials.gov in parallel, ranks 50–300 results using OpenAI embeddings, and delivers source-backed answers via gpt model with multi-turn memory.",
+    live: "https://lnkd.in/g2h6q9H7",
+    github: "https://lnkd.in/gvvEdcNq",
+    status: "Live",
+  },
+  {
+    number: "03",
+    title: "YouTube Chatbot",
+    accentColor: "#f26522",
+    tags: ["RAG", "LangChain", "OpenAI", "Vector DB"],
+    stack:
+      "Python · LangChain · Chroma · FastAPI · OpenAI Embeddings · React.js",
+    desc: "End-to-end RAG pipeline ingesting YouTube transcripts, storing in ChromaDB for semantic retrieval, serving context-aware answers via a real-time React chat interface.",
+    github: "https://github.com/adityasoran0698",
+    status: "GitHub",
+  },
+  {
+    number: "04",
+    title: "AI Research Analyser",
+    accentColor: "#818CF8",
+    tags: ["Generative AI", "LangChain", "FastAPI"],
+    stack: "React · Tailwind CSS · FastAPI · LangChain · OpenAI API",
+    desc: "Enter any research paper title, pick an explanation style (Beginner / Technical / Code-Oriented / Mathematical) and get a structured LLM-generated breakdown instantly.",
+    github: "https://github.com/adityasoran0698/ai-research-analyser",
+    status: "GitHub",
+  },
+];
+
+function ProjectCard({ project }) {
+  const {
+    number,
+    title,
+    accentColor,
+    tags,
+    stack,
+    desc,
+    live,
+    github,
+    status,
+  } = project;
+  const stackItems = stack.split(" · ");
+  return (
+    <div
+      className="proj-card-new"
+      style={{
+        background: "rgba(14,6,0,.97)",
+        border: `1px solid ${accentColor}22`,
+        borderRadius: 22,
+        overflow: "hidden",
+        boxShadow: `0 4px 28px rgba(0,0,0,.5)`,
+        position: "relative",
+        padding: "32px 30px 28px",
+        height: "100%",
+      }}
+    >
+      <div
+        style={{
+          position: "absolute",
+          top: -24,
+          right: 10,
+          fontFamily: "'Outfit',sans-serif",
+          fontSize: 140,
+          fontWeight: 900,
+          color: `${accentColor}07`,
+          lineHeight: 1,
+          userSelect: "none",
+          pointerEvents: "none",
+        }}
+      >
+        {number}
+      </div>
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 2,
+          background: `linear-gradient(90deg,${accentColor},${accentColor}40,transparent)`,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: 100,
+          height: 100,
+          background: `radial-gradient(circle at 0% 0%,${accentColor}12 0%,transparent 65%)`,
+          pointerEvents: "none",
+        }}
+      />
+
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: 16,
+          position: "relative",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "monospace",
+            fontSize: 10,
+            fontWeight: 700,
+            color: `${accentColor}50`,
+            letterSpacing: "0.14em",
+          }}
+        >
+          {number}
+        </span>
         {status && (
           <div
             style={{
-              position: "absolute",
-              top: 14,
-              right: 14,
-              zIndex: 4,
               display: "flex",
               alignItems: "center",
               gap: 5,
-              background: "rgba(0,0,0,0.65)",
-              border: "1px solid rgba(34,197,94,0.4)",
+              background: `${accentColor}14`,
+              border: `1px solid ${accentColor}35`,
               borderRadius: 50,
-              padding: "4px 12px",
-              backdropFilter: "blur(8px)",
+              padding: "3px 11px",
             }}
           >
             <div
               style={{
-                width: 6,
-                height: 6,
+                width: 5,
+                height: 5,
                 borderRadius: "50%",
                 background: "#22c55e",
-                boxShadow: "0 0 6px #22c55e",
+                boxShadow: "0 0 5px #22c55e",
               }}
             />
-            <span style={{ fontSize: 10, fontWeight: 700, color: "#22c55e" }}>
+            <span
+              style={{
+                fontSize: 9.5,
+                fontWeight: 700,
+                color: "#22c55e",
+                letterSpacing: "0.06em",
+              }}
+            >
               {status}
             </span>
           </div>
         )}
       </div>
-      <div style={{ padding: "20px 22px 22px" }}>
-        <div
-          style={{
-            display: "flex",
-            gap: 6,
-            flexWrap: "wrap",
-            marginBottom: 12,
-          }}
-        >
-          {tags.map((t) => (
-            <span
-              key={t}
-              style={{
-                fontSize: 10,
-                padding: "3px 10px",
-                borderRadius: 20,
-                background: "rgba(242,101,34,0.12)",
-                color: "#f26522",
-                fontWeight: 700,
-                letterSpacing: "0.04em",
-              }}
-            >
-              {t}
-            </span>
-          ))}
-        </div>
-        <h3
-          style={{
-            fontFamily: "Plus Jakarta Sans,sans-serif",
-            fontSize: 19,
-            fontWeight: 800,
-            color: "#f5f0e8",
-            marginBottom: 8,
-          }}
-        >
-          {title}
-        </h3>
-        <p
-          style={{
-            fontSize: 13,
-            color: "#a08060",
-            lineHeight: 1.7,
-            marginBottom: 14,
-          }}
-        >
-          {desc}
-        </p>
-        <div
-          style={{
-            fontSize: 10.5,
-            color: "#705040",
-            marginBottom: 18,
-            fontFamily: "monospace",
-            background: "rgba(242,101,34,0.05)",
-            padding: "7px 12px",
-            borderRadius: 8,
-            borderLeft: "2px solid rgba(242,101,34,0.3)",
-          }}
-        >
-          {stack}
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          {live && (
-            <a
-              href={live}
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                padding: "8px 18px",
-                borderRadius: 50,
-                background: "linear-gradient(135deg,#f26522,#c04a00)",
-                color: "white",
-                fontSize: 11.5,
-                fontWeight: 700,
-                textDecoration: "none",
-              }}
-            >
-              Live Demo ↗
-            </a>
-          )}
-          {github && (
-            <a
-              href={github}
-              target="_blank"
-              rel="noreferrer"
-              className="btn-ghost"
-              style={{
-                padding: "8px 18px",
-                borderRadius: 50,
-                border: "1.5px solid rgba(242,101,34,0.35)",
-                color: "#f26522",
-                fontSize: 11.5,
-                fontWeight: 700,
-                textDecoration: "none",
-              }}
-            >
-              GitHub
-            </a>
-          )}
-        </div>
+      <div
+        style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 12 }}
+      >
+        {tags.map((t) => (
+          <span
+            key={t}
+            style={{
+              fontSize: 9.5,
+              padding: "3px 10px",
+              borderRadius: 20,
+              background: `${accentColor}15`,
+              color: accentColor,
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              textTransform: "uppercase",
+              border: `1px solid ${accentColor}25`,
+            }}
+          >
+            {t}
+          </span>
+        ))}
+      </div>
+      <h3
+        style={{
+          fontFamily: "'Outfit',sans-serif",
+          fontSize: 28,
+          fontWeight: 800,
+          color: "#f5f0e8",
+          marginBottom: 8,
+          lineHeight: 1.1,
+          letterSpacing: "-0.02em",
+        }}
+      >
+        {title}
+      </h3>
+      <div
+        style={{
+          width: 48,
+          height: 2,
+          background: `linear-gradient(90deg,${accentColor},transparent)`,
+          marginBottom: 12,
+          borderRadius: 2,
+        }}
+      />
+      <p
+        style={{
+          fontSize: 13.5,
+          color: "#907060",
+          lineHeight: 1.75,
+          marginBottom: 20,
+        }}
+      >
+        {desc}
+      </p>
+      <div
+        style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 24 }}
+      >
+        {stackItems.map((s) => (
+          <span
+            key={s}
+            style={{
+              fontSize: 10,
+              padding: "4px 10px",
+              borderRadius: 6,
+              background: "rgba(242,101,34,.06)",
+              color: "#705040",
+              fontWeight: 600,
+              letterSpacing: "0.04em",
+              border: "1px solid rgba(242,101,34,.12)",
+              fontFamily: "monospace",
+            }}
+          >
+            {s}
+          </span>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 10 }}>
+        {live && live !== "#" && (
+          <a
+            href={live}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              padding: "9px 22px",
+              borderRadius: 50,
+              background: `linear-gradient(135deg,${accentColor},${accentColor}bb)`,
+              color: "white",
+              fontSize: 12,
+              fontWeight: 700,
+              textDecoration: "none",
+              boxShadow: `0 4px 16px ${accentColor}35`,
+            }}
+          >
+            Live Demo ↗
+          </a>
+        )}
+        {github && (
+          <a
+            href={github}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-ghost"
+            style={{
+              padding: "9px 22px",
+              borderRadius: 50,
+              border: `1.5px solid ${accentColor}45`,
+              color: accentColor,
+              fontSize: 12,
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            GitHub ↗
+          </a>
+        )}
       </div>
     </div>
   );
 }
 
-/* ─────────────────────────────────────────────
-   NAV LINK
-───────────────────────────────────────────── */
-function NavLink({ label, active, onClick }) {
+function ProjectsSection() {
+  const CARDS_PER_VIEW = 3;
+
+  const chunks = [];
+  for (let i = 0; i < PROJECTS.length; i += CARDS_PER_VIEW) {
+    chunks.push(PROJECTS.slice(i, i + CARDS_PER_VIEW));
+  }
+
+  const totalWindows = chunks.length;
+  const canSlide = totalWindows > 1;
+
+  const [windowIndex, setWindowIndex] = useState(0);
+  const [displayIndex, setDisplayIndex] = useState(0);
+  const [phase, setPhase] = useState("idle");
+  const [slideDir, setSlideDir] = useState(null);
+
+  const doSlide = (dir) => {
+    if (phase !== "idle") return;
+    const next =
+      dir === "next"
+        ? Math.min(windowIndex + 1, totalWindows - 1)
+        : Math.max(windowIndex - 1, 0);
+    if (next === windowIndex) return;
+
+    setSlideDir(dir === "next" ? "left" : "right");
+    setPhase("exit");
+
+    setTimeout(() => {
+      setDisplayIndex(next);
+      setWindowIndex(next);
+      setPhase("enter");
+      setTimeout(() => setPhase("idle"), 340);
+    }, 220);
+  };
+
+  const visibleChunk = chunks[displayIndex] || [];
+
   return (
-    <a
-      href={`#${label.toLowerCase()}`}
-      onClick={onClick}
-      className="nav-link"
+    <section
+      id="projects"
       style={{
-        padding: "8px 20px",
-        borderRadius: 50,
-        fontSize: 13.5,
-        fontWeight: active ? 700 : 500,
-        color: active ? "white" : "rgba(255,255,255,0.65)",
-        background: active
-          ? "linear-gradient(135deg,#f26522,#c04a00)"
-          : "transparent",
-        border: active
-          ? "1px solid rgba(242,101,34,0.5)"
-          : "1px solid transparent",
-        boxShadow: active
-          ? "0 4px 18px rgba(242,101,34,0.45), inset 0 1px 0 rgba(255,255,255,0.25)"
-          : "none",
-        textDecoration: "none",
-        letterSpacing: active ? "-0.01em" : "0",
-        transition: "all 0.22s cubic-bezier(0.4,0,0.2,1)",
-        whiteSpace: "nowrap",
-      }}
-      onMouseEnter={(e) => {
-        if (!active) {
-          e.currentTarget.style.color = "rgba(255,255,255,0.9)";
-          e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-        }
-      }}
-      onMouseLeave={(e) => {
-        if (!active) {
-          e.currentTarget.style.color = "rgba(255,255,255,0.65)";
-          e.currentTarget.style.background = "transparent";
-        }
+        padding: "96px 52px",
+        background: "#160b00",
+        position: "relative",
+        overflow: "hidden",
+        fontFamily: "'DM Sans',sans-serif",
       }}
     >
-      {label}
-    </a>
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+          opacity: 0.4,
+          backgroundImage: `radial-gradient(circle at 20% 50%,rgba(242,101,34,.04) 0%,transparent 50%),radial-gradient(circle at 80% 20%,rgba(167,139,250,.03) 0%,transparent 50%)`,
+        }}
+      />
+      <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative" }}>
+        {/* Header — no arrows here anymore */}
+        <div style={{ marginBottom: 48 }}>
+          <p
+            style={{
+              color: "#f26522",
+              fontSize: 11,
+              fontWeight: 700,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              marginBottom: 8,
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            <span
+              style={{
+                width: 24,
+                height: 1,
+                background: "#f26522",
+                display: "inline-block",
+              }}
+            />
+            What I've built
+          </p>
+          <h2
+            style={{
+              fontFamily: "'Outfit','Plus Jakarta Sans',sans-serif",
+              fontSize: "clamp(32px,4vw,52px)",
+              fontWeight: 900,
+              letterSpacing: "-0.02em",
+              lineHeight: 1.1,
+              color: "#f5f0e8",
+            }}
+          >
+            Featured <span style={{ color: "#f26522" }}>Projects</span>
+          </h2>
+        </div>
+
+        {/* Sliding track */}
+        <div style={{ overflow: "hidden", position: "relative" }}>
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, 1fr)",
+              gap: 20,
+              animation:
+                phase === "exit"
+                  ? `slideOut${slideDir === "left" ? "Left" : "Right"} .22s cubic-bezier(.4,0,.2,1) both`
+                  : phase === "enter"
+                    ? `slideIn${slideDir === "left" ? "Right" : "Left"} .34s cubic-bezier(.22,1,.36,1) both`
+                    : "none",
+            }}
+          >
+            {visibleChunk.length === 1 && <div />}
+            {visibleChunk.map((p) => (
+              <ProjectCard key={p.number} project={p} />
+            ))}
+            {visibleChunk.length === 1 && <div />}
+            {visibleChunk.length === 2 && <div />}
+          </div>
+        </div>
+
+        {/* Bottom controls — centered below cards */}
+        {canSlide && (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 16,
+              marginTop: 40,
+            }}
+          >
+            {/* Prev button */}
+            <button
+              onClick={() => doSlide("prev")}
+              disabled={windowIndex === 0 || phase !== "idle"}
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: "50%",
+                border: `1px solid ${windowIndex === 0 ? "rgba(242,101,34,.12)" : "rgba(242,101,34,.3)"}`,
+                background: "transparent",
+                color:
+                  windowIndex === 0
+                    ? "rgba(242,101,34,.2)"
+                    : "rgba(242,101,34,.7)",
+                fontSize: 16,
+                cursor: windowIndex === 0 ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all .22s ease",
+                backdropFilter: "blur(8px)",
+              }}
+              onMouseEnter={(e) => {
+                if (windowIndex !== 0) {
+                  e.currentTarget.style.background = "rgba(242,101,34,.08)";
+                  e.currentTarget.style.borderColor = "rgba(242,101,34,.55)";
+                  e.currentTarget.style.color = "#f26522";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "transparent";
+                e.currentTarget.style.borderColor =
+                  windowIndex === 0
+                    ? "rgba(242,101,34,.12)"
+                    : "rgba(242,101,34,.3)";
+                e.currentTarget.style.color =
+                  windowIndex === 0
+                    ? "rgba(242,101,34,.2)"
+                    : "rgba(242,101,34,.7)";
+              }}
+            >
+              ←
+            </button>
+
+            {/* Dots + counter pill */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 10,
+                padding: "10px 20px",
+                borderRadius: 50,
+                background: "rgba(255,255,255,.03)",
+                border: "1px solid rgba(242,101,34,.12)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              {/* Dots */}
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                {Array.from({ length: totalWindows }).map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => {
+                      if (phase !== "idle" || i === windowIndex) return;
+                      const dir = i > windowIndex ? "left" : "right";
+                      setSlideDir(dir);
+                      setPhase("exit");
+                      setTimeout(() => {
+                        setDisplayIndex(i);
+                        setWindowIndex(i);
+                        setPhase("enter");
+                        setTimeout(() => setPhase("idle"), 340);
+                      }, 220);
+                    }}
+                    style={{
+                      width: i === windowIndex ? 20 : 6,
+                      height: 6,
+                      borderRadius: 3,
+                      border: "none",
+                      background:
+                        i === windowIndex ? "#f26522" : "rgba(242,101,34,.25)",
+                      cursor: i === windowIndex ? "default" : "pointer",
+                      padding: 0,
+                      transition: "all .35s cubic-bezier(.34,1.56,.64,1)",
+                    }}
+                  />
+                ))}
+              </div>
+
+              {/* Divider */}
+              <div
+                style={{
+                  width: 1,
+                  height: 14,
+                  background: "rgba(242,101,34,.2)",
+                  borderRadius: 1,
+                }}
+              />
+
+              {/* Counter */}
+              <span
+                style={{
+                  fontFamily: "'Outfit',sans-serif",
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "rgba(242,101,34,.6)",
+                  letterSpacing: "0.08em",
+                  userSelect: "none",
+                }}
+              >
+                {windowIndex + 1}{" "}
+                <span style={{ color: "rgba(242,101,34,.3)" }}>/</span>{" "}
+                {totalWindows}
+              </span>
+            </div>
+
+            {/* Next button */}
+            <button
+              onClick={() => doSlide("next")}
+              disabled={windowIndex >= totalWindows - 1 || phase !== "idle"}
+              style={{
+                width: 42,
+                height: 42,
+                borderRadius: "50%",
+                border: `1px solid ${windowIndex >= totalWindows - 1 ? "rgba(242,101,34,.12)" : "rgba(242,101,34,.3)"}`,
+                background:
+                  windowIndex < totalWindows - 1
+                    ? "rgba(242,101,34,.06)"
+                    : "transparent",
+                color:
+                  windowIndex >= totalWindows - 1
+                    ? "rgba(242,101,34,.2)"
+                    : "rgba(242,101,34,.7)",
+                fontSize: 16,
+                cursor:
+                  windowIndex >= totalWindows - 1 ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                transition: "all .22s ease",
+                backdropFilter: "blur(8px)",
+              }}
+              onMouseEnter={(e) => {
+                if (windowIndex < totalWindows - 1) {
+                  e.currentTarget.style.background = "rgba(242,101,34,.12)";
+                  e.currentTarget.style.borderColor = "rgba(242,101,34,.55)";
+                  e.currentTarget.style.color = "#f26522";
+                }
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background =
+                  windowIndex < totalWindows - 1
+                    ? "rgba(242,101,34,.06)"
+                    : "transparent";
+                e.currentTarget.style.borderColor =
+                  windowIndex >= totalWindows - 1
+                    ? "rgba(242,101,34,.12)"
+                    : "rgba(242,101,34,.3)";
+                e.currentTarget.style.color =
+                  windowIndex >= totalWindows - 1
+                    ? "rgba(242,101,34,.2)"
+                    : "rgba(242,101,34,.7)";
+              }}
+            >
+              →
+            </button>
+          </div>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes slideOutLeft {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(-40px); }
+        }
+        @keyframes slideOutRight {
+          from { opacity: 1; transform: translateX(0); }
+          to   { opacity: 0; transform: translateX(40px); }
+        }
+        @keyframes slideInRight {
+          from { opacity: 0; transform: translateX(48px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInLeft {
+          from { opacity: 0; transform: translateX(-48px); }
+          to   { opacity: 1; transform: translateX(0); }
+        }
+      `}</style>
+    </section>
   );
 }
 
-/* ─────────────────────────────────────────────
-   MAIN APP
-───────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAIN PORTFOLIO COMPONENT
+═══════════════════════════════════════════════════════════════════════════ */
 export default function Portfolio() {
   const photoUrl = backgroundImage;
   const [loaded, setLoaded] = useState(false);
-  const [activeNav, setActiveNav] = useState("Home");
-  const [scrolled, setScrolled] = useState(false);
+  const heroRef = useRef(null);
   const cursorDot = useRef(null);
-  const mousePos = useRef({ x: 0, y: 0 });
-  const rafId = useRef(null);
 
   useEffect(() => {
     const style = document.createElement("style");
     style.textContent = GLOBAL_CSS;
     document.head.appendChild(style);
     const onMove = (e) => {
-      mousePos.current = { x: e.clientX, y: e.clientY };
+      if (cursorDot.current)
+        cursorDot.current.style.transform = `translate(${e.clientX - 5}px,${e.clientY - 5}px)`;
     };
-    const animate = () => {
-      if (cursorDot.current) {
-        const { x: mx, y: my } = mousePos.current;
-        cursorDot.current.style.transform = `translate(${mx - 5}px, ${my - 5}px)`;
-      }
-      rafId.current = requestAnimationFrame(animate);
-    };
-    const onScroll = () => setScrolled(window.scrollY > 40);
     document.addEventListener("mousemove", onMove);
-    window.addEventListener("scroll", onScroll);
-    rafId.current = requestAnimationFrame(animate);
     return () => {
       document.removeEventListener("mousemove", onMove);
-      window.removeEventListener("scroll", onScroll);
-      cancelAnimationFrame(rafId.current);
       document.head.removeChild(style);
     };
   }, []);
-
-  const NAV = ["Home", "About", "Skills", "Projects", "Connect"];
-  const YTIcon = ({ size = 64 }) => (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
-      <rect
-        x="8"
-        y="18"
-        width="48"
-        height="28"
-        rx="8"
-        fill="rgba(242,101,34,0.15)"
-        stroke="rgba(242,101,34,0.4)"
-        strokeWidth="1.5"
-      />
-      <polygon points="26,24 44,32 26,40" fill="rgba(242,101,34,0.8)" />
-      <rect
-        x="12"
-        y="50"
-        width="40"
-        height="3"
-        rx="1.5"
-        fill="rgba(242,101,34,0.3)"
-      />
-      <path
-        d="M20 14h4M28 14h8M40 14h4"
-        stroke="rgba(242,101,34,0.5)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-  const AIResearchIcon = ({ size = 64 }) => (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
-      <rect
-        x="14"
-        y="10"
-        width="28"
-        height="36"
-        rx="4"
-        fill="rgba(129,140,248,0.15)"
-        stroke="rgba(129,140,248,0.4)"
-        strokeWidth="1.5"
-      />
-      <line
-        x1="20"
-        y1="20"
-        x2="36"
-        y2="20"
-        stroke="rgba(129,140,248,0.7)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <line
-        x1="20"
-        y1="26"
-        x2="36"
-        y2="26"
-        stroke="rgba(129,140,248,0.5)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <line
-        x1="20"
-        y1="32"
-        x2="30"
-        y2="32"
-        stroke="rgba(129,140,248,0.4)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-      />
-      <circle
-        cx="44"
-        cy="42"
-        r="8"
-        fill="rgba(129,140,248,0.15)"
-        stroke="rgba(129,140,248,0.6)"
-        strokeWidth="1.5"
-      />
-      <circle cx="44" cy="42" r="3" fill="rgba(129,140,248,0.5)" />
-      <line
-        x1="50"
-        y1="48"
-        x2="54"
-        y2="52"
-        stroke="rgba(129,140,248,0.7)"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 
   if (!loaded) return <NetflixIntro onComplete={() => setLoaded(true)} />;
 
@@ -2408,7 +3201,7 @@ export default function Portfolio() {
           transition: "none",
         }}
       />
-
+      <DualNavbar cvUrl={MyCV} />
       <div
         className="site-enter"
         style={{
@@ -2419,102 +3212,16 @@ export default function Portfolio() {
           cursor: "none",
         }}
       >
-        {/* NAVBAR */}
-        <nav
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            zIndex: 100,
-            height: 72,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background: scrolled ? "rgba(14,6,0,0.6)" : "transparent",
-            backdropFilter: scrolled ? "blur(28px) saturate(200%)" : "none",
-            WebkitBackdropFilter: scrolled
-              ? "blur(28px) saturate(200%)"
-              : "none",
-            borderBottom: scrolled
-              ? "1px solid rgba(255,255,255,0.05)"
-              : "none",
-            transition: "all 0.3s ease",
-            padding: "0 52px",
-          }}
-        >
-          <div
-            style={{
-              position: "absolute",
-              left: 52,
-              fontFamily: "Plus Jakarta Sans,sans-serif",
-              fontSize: 22,
-              fontWeight: 800,
-              letterSpacing: "-0.01em",
-            }}
-          >
-            aditya<span style={{ color: "#f26522" }}>.</span>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              gap: 2,
-              alignItems: "center",
-              background: "rgba(255,255,255,0.07)",
-              backdropFilter: "blur(40px) saturate(220%)",
-              WebkitBackdropFilter: "blur(40px) saturate(220%)",
-              border: "1px solid rgba(255,255,255,0.15)",
-              borderRadius: 50,
-              padding: "5px 6px",
-              boxShadow:
-                "inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -1px 0 rgba(0,0,0,0.15), 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.25)",
-            }}
-          >
-            {NAV.map((n) => (
-              <NavLink
-                key={n}
-                label={n}
-                active={activeNav === n}
-                onClick={() => setActiveNav(n)}
-              />
-            ))}
-          </div>
-          <a
-            href={MyCV}
-            target="_blank"
-            rel="noreferrer"
-            className="btn-ghost"
-            style={{
-              position: "absolute",
-              right: 52,
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "9px 18px",
-              borderRadius: 50,
-              background: "rgba(255,255,255,0.05)",
-              border: "1px solid rgba(255,255,255,0.1)",
-              backdropFilter: "blur(16px)",
-              color: "#f5f0e8",
-              fontSize: 13,
-              fontWeight: 600,
-              textDecoration: "none",
-              boxShadow: "inset 0 1px 0 rgba(255,255,255,0.15)",
-            }}
-          >
-            <Icons.CV size={15} /> Download CV
-          </a>
-        </nav>
-
         {/* HERO */}
         <section
           id="home"
+          ref={heroRef}
           style={{
             minHeight: "100vh",
             display: "flex",
             alignItems: "center",
-            padding: "96px 52px 0",
-            background: `radial-gradient(ellipse 75% 55% at 68% 50%, rgba(180,65,0,0.23) 0%, transparent 68%), radial-gradient(ellipse 50% 40% at 15% 75%, rgba(110,35,0,0.18) 0%, transparent 55%), #160b00`,
+            padding: "0 52px",
+            background: `radial-gradient(ellipse 75% 55% at 68% 50%,rgba(180,65,0,.23) 0%,transparent 68%),radial-gradient(ellipse 50% 40% at 15% 75%,rgba(110,35,0,.18) 0%,transparent 55%),#160b00`,
             position: "relative",
             overflow: "hidden",
           }}
@@ -2525,7 +3232,7 @@ export default function Portfolio() {
               inset: 0,
               opacity: 0.028,
               backgroundImage:
-                "radial-gradient(circle, #f26522 1px, transparent 1px)",
+                "radial-gradient(circle,#f26522 1px,transparent 1px)",
               backgroundSize: "38px 38px",
               pointerEvents: "none",
             }}
@@ -2536,7 +3243,7 @@ export default function Portfolio() {
               top: "6%",
               right: "1%",
               animation: "floatY 5.5s ease-in-out infinite",
-              animationDelay: "0.6s",
+              animationDelay: ".6s",
               opacity: 0.7,
               filter: "drop-shadow(0 0 30px #f26522)",
             }}
@@ -2547,7 +3254,7 @@ export default function Portfolio() {
             style={{
               position: "absolute",
               bottom: "10%",
-              left: "0.5%",
+              left: ".5%",
               animation: "floatY 4s ease-in-out infinite",
               animationDelay: "1.2s",
               opacity: 0.45,
@@ -2601,7 +3308,7 @@ export default function Portfolio() {
               >
                 Hey, I am{" "}
                 <span style={{ color: "#f26522", fontWeight: 700 }}>
-                  Aditya
+                  Aditya Soran
                 </span>
               </p>
               <h1
@@ -2616,8 +3323,7 @@ export default function Portfolio() {
                   marginBottom: 14,
                 }}
               >
-                AI & Full Stack
-                <br />
+                AI {/* <br /> */}
                 <span style={{ color: "#f26522" }}>Developer</span>
               </h1>
               <div
@@ -2670,7 +3376,7 @@ export default function Portfolio() {
                     width: 52,
                     height: 52,
                     borderRadius: "50%",
-                    border: "1.5px solid rgba(242,101,34,0.35)",
+                    border: "1.5px solid rgba(242,101,34,.35)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
@@ -2688,7 +3394,7 @@ export default function Portfolio() {
                   style={{
                     padding: "14px 28px",
                     borderRadius: 50,
-                    border: "1.5px solid rgba(242,101,34,0.35)",
+                    border: "1.5px solid rgba(242,101,34,.35)",
                     color: "#f26522",
                     fontSize: 14,
                     fontWeight: 700,
@@ -2707,82 +3413,9 @@ export default function Portfolio() {
           </div>
         </section>
 
-        {/* ABOUT */}
         <AboutSection />
-
-        {/* SKILLS */}
         <SkillsSection />
-
-        {/* PROJECTS */}
-        <section
-          id="projects"
-          style={{ padding: "96px 52px", position: "relative" }}
-        >
-          <div style={{ maxWidth: 1080, margin: "0 auto" }}>
-            <p
-              style={{
-                color: "#f26522",
-                fontSize: 12,
-                fontWeight: 700,
-                letterSpacing: "0.16em",
-                textTransform: "uppercase",
-                marginBottom: 6,
-              }}
-            >
-              What I've built
-            </p>
-            <h2
-              style={{
-                fontFamily: "Plus Jakarta Sans,sans-serif",
-                fontSize: 42,
-                fontWeight: 800,
-                letterSpacing: "-0.01em",
-                marginBottom: 44,
-              }}
-            >
-              Featured <span style={{ color: "#f26522" }}>Projects</span>
-            </h2>
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fill,minmax(320px,1fr))",
-                gap: 24,
-              }}
-            >
-              <ProjectCard
-                title="AyurSutra"
-                tags={["Hackathon Project", "Full Stack", "AI / NLP", "MERN"]}
-                stack="MERN · FastAPI · NLP · Sentiment Analysis · JWT"
-                desc="Full-stack Ayurveda therapy booking platform with role-based access, auto-scheduling, and AI-powered 3-class sentiment NLP — built for Ministry of AYUSH."
-                live="#"
-                github="https://github.com/adityasoran0698"
-                bgColor="linear-gradient(135deg, rgba(5,25,10,0.95), rgba(10,40,15,0.9))"
-                ProjectIcon={AyurImage}
-                status="Live"
-              />
-              <ProjectCard
-                title="YouTube Chatbot"
-                tags={["RAG", "LangChain", "OpenAI", "Vector DB"]}
-                stack="Python · LangChain · Chroma · FastAPI · OpenAI Embeddings · React.js"
-                desc="End-to-end RAG pipeline ingesting YouTube transcripts, storing in ChromaDB for semantic retrieval, serving context-aware answers via a real-time React chat interface."
-                github="https://github.com/adityasoran0698"
-                bgColor="linear-gradient(135deg, rgba(25,8,0,0.95), rgba(40,15,0,0.9))"
-                ProjectIcon={YoutubeImage}
-                status="GitHub"
-              />
-              <ProjectCard
-                title="AI Research Analyser"
-                tags={["Generative AI", "LangChain", "FastAPI", "React"]}
-                stack="React · Tailwind CSS · FastAPI · LangChain · OpenAI API"
-                desc="Enter any research paper title, pick an explanation style (Beginner / Technical / Code-Oriented / Mathematical) and get a structured LLM-generated breakdown instantly."
-                github="https://github.com/adityasoran0698/ai-research-analyser"
-                bgColor="linear-gradient(135deg, rgba(8,5,25,0.95), rgba(15,10,40,0.9))"
-                ProjectIcon={AIResearchIcon}
-                status="GitHub"
-              />
-            </div>
-          </div>
-        </section>
+        <ProjectsSection />
 
         {/* CONNECT */}
         <section
@@ -2790,7 +3423,7 @@ export default function Portfolio() {
           style={{
             padding: "96px 52px 112px",
             textAlign: "center",
-            background: `radial-gradient(ellipse 65% 55% at 50% 50%, rgba(180,65,0,0.16) 0%, transparent 68%), #160b00`,
+            background: `radial-gradient(ellipse 65% 55% at 50% 50%,rgba(180,65,0,.16) 0%,transparent 68%),#160b00`,
           }}
         >
           <div style={{ maxWidth: 620, margin: "0 auto" }}>
@@ -2865,7 +3498,7 @@ export default function Portfolio() {
                 style={{
                   padding: "13px 26px",
                   borderRadius: 50,
-                  border: "1.5px solid rgba(242,101,34,0.35)",
+                  border: "1.5px solid rgba(242,101,34,.35)",
                   color: "#f26522",
                   fontWeight: 700,
                   fontSize: 14.5,
@@ -2882,7 +3515,7 @@ export default function Portfolio() {
                 style={{
                   padding: "13px 26px",
                   borderRadius: 50,
-                  border: "1.5px solid rgba(242,101,34,0.35)",
+                  border: "1.5px solid rgba(242,101,34,.35)",
                   color: "#f26522",
                   fontWeight: 700,
                   fontSize: 14.5,
@@ -2893,7 +3526,25 @@ export default function Portfolio() {
               </a>
             </div>
             <p style={{ marginTop: 20, fontSize: 12.5, color: "#705040" }}>
-              📍 Ghaziabad, Uttar Pradesh &nbsp;·&nbsp; +91 6396369163
+              <svg
+                style={{
+                  display: "inline",
+                  verticalAlign: "middle",
+                  marginRight: 4,
+                }}
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#705040"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              Ghaziabad, Uttar Pradesh &nbsp;·&nbsp; +91 6396369163
             </p>
           </div>
         </section>
@@ -2901,7 +3552,7 @@ export default function Portfolio() {
         {/* FOOTER */}
         <div
           style={{
-            borderTop: "1px solid rgba(242,101,34,0.1)",
+            borderTop: "1px solid rgba(242,101,34,.1)",
             padding: "20px 52px",
             display: "flex",
             justifyContent: "space-between",
@@ -2918,7 +3569,7 @@ export default function Portfolio() {
             aditya<span style={{ color: "#f26522" }}>.</span>
           </span>
           <span style={{ fontSize: 12, color: "#604030" }}>
-            © 2025 Aditya Soran &nbsp;·&nbsp; AI & Full Stack Developer
+            © 2025 Aditya Soran &nbsp;·&nbsp; AI Developer
           </span>
         </div>
       </div>
