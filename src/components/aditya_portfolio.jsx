@@ -101,6 +101,173 @@ const GLOBAL_CSS = `
 
   .proj-card-new { transition:transform .28s ease,box-shadow .28s ease; }
   .proj-card-new:hover { transform:translateY(-6px); box-shadow:0 24px 60px rgba(242,101,34,.22)!important; }
+
+  /* ─── MOBILE RESPONSIVE ─────────────────────────────────────────────────── */
+
+  /* Hero Nav — hide on mobile */
+  @media (max-width: 767px) {
+    .hero-nav-header { display: none !important; }
+  }
+
+  /* Floating Nav — tighter on mobile */
+  @media (max-width: 767px) {
+    .lg-nav {
+      bottom: 14px !important;
+      left: 50% !important;
+      right: auto !important;
+      padding: 4px 5px !important;
+    }
+    .lg-nav-link {
+      padding: 7px 10px !important;
+      font-size: 11px !important;
+    }
+  }
+
+  /* Hero section — single column, no avatar */
+  @media (max-width: 767px) {
+    .hero-section {
+      padding: 90px 22px 60px !important;
+      min-height: auto !important;
+      align-items: flex-start !important;
+    }
+    .hero-inner {
+      flex-direction: column !important;
+      gap: 0 !important;
+    }
+    .hero-text-col {
+      flex: none !important;
+      width: 100% !important;
+    }
+    .hero-avatar-col {
+      display: none !important;
+    }
+    .hero-title {
+      font-size: clamp(42px, 12vw, 56px) !important;
+    }
+    .hero-subtitle {
+      font-size: 15px !important;
+    }
+    .hero-cta-row {
+      flex-wrap: wrap !important;
+      gap: 12px !important;
+    }
+    .hero-lightning-top,
+    .hero-lightning-bottom,
+    .hero-dot { display: none !important; }
+  }
+
+  /* About section */
+  @media (max-width: 767px) {
+    .about-section {
+      padding: 64px 22px !important;
+    }
+    .about-header-row {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 14px !important;
+    }
+    .about-name {
+      font-size: clamp(40px, 11vw, 56px) !important;
+    }
+    .about-bio-flex { display: none !important; } /* hide right desc on mobile */
+    .about-two-col {
+      grid-template-columns: 1fr !important;
+    }
+    .about-strengths-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* Skills section */
+  @media (max-width: 767px) {
+    .skills-section {
+      padding: 64px 22px 72px !important;
+    }
+    .skills-header-row {
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      gap: 16px !important;
+    }
+    .skills-header-desc { display: none !important; }
+    .skills-title {
+      font-size: clamp(40px, 11vw, 60px) !important;
+    }
+    .skills-tab-bar {
+      gap: 7px !important;
+      overflow-x: auto !important;
+      flex-wrap: nowrap !important;
+      padding-bottom: 6px !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .skills-tab-bar::-webkit-scrollbar { display: none; }
+    .skills-active-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .skills-chips-grid {
+      grid-template-columns: 1fr 1fr !important;
+    }
+    .skills-inactive-col {
+      display: none !important;
+    }
+  }
+
+  /* Projects section */
+  @media (max-width: 767px) {
+    .projects-section {
+      padding: 64px 22px !important;
+    }
+    .projects-cards-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .proj-card-new:hover {
+      transform: none !important;
+    }
+  }
+
+  /* Connect section */
+  @media (max-width: 767px) {
+    .connect-section {
+      padding: 64px 22px 80px !important;
+    }
+    .connect-cta-row {
+      flex-direction: column !important;
+      align-items: center !important;
+      gap: 12px !important;
+    }
+    .connect-cta-row a {
+      width: 100% !important;
+      max-width: 320px !important;
+      justify-content: center !important;
+    }
+  }
+
+  /* Footer */
+  @media (max-width: 767px) {
+    .footer-bar {
+      padding: 18px 22px !important;
+      flex-direction: column !important;
+      gap: 6px !important;
+      text-align: center !important;
+    }
+  }
+
+  /* Tablet (768px – 1023px) — keep mostly desktop, just tighten padding */
+  @media (min-width: 768px) and (max-width: 1023px) {
+    .hero-section { padding: 0 32px !important; }
+    .hero-title { font-size: clamp(34px, 4.5vw, 52px) !important; }
+    .about-section { padding: 80px 32px !important; }
+    .about-two-col { grid-template-columns: 1fr !important; }
+    .about-strengths-grid { grid-template-columns: 1fr 1fr !important; }
+    .skills-section { padding: 80px 32px 88px !important; }
+    .skills-active-grid { grid-template-columns: 1fr !important; }
+    .skills-inactive-col { display: none !important; }
+    .projects-section { padding: 80px 32px !important; }
+    .projects-cards-grid { grid-template-columns: 1fr 1fr !important; }
+    .connect-section { padding: 80px 32px 96px !important; }
+    .footer-bar { padding: 18px 32px !important; }
+    .hero-avatar-col img { width: 400px !important; }
+  }
 `;
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -208,7 +375,7 @@ const Icons = {
         cy="7"
         r="2.5"
         fill="#A78BFA"
-        stroke="#7C3AED"
+        stroke="#A78BFA"
         strokeWidth="1"
       />
       <rect x="2" y="17" width="3" height="6" rx="1.5" fill="#A78BFA" />
@@ -262,7 +429,6 @@ const Icons = {
       <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
     </svg>
   ),
-  // Real tech icons for skill badges
   LangChain: ({ size = 22 }) => (
     <svg width={size} height={size} viewBox="0 0 32 32" fill="none">
       <rect width="32" height="32" rx="8" fill="#1C1C1C" />
@@ -947,6 +1113,7 @@ function Avatar3D({ photoUrl }) {
           <img
             src={photoUrl}
             alt="Aditya"
+            className="hero-avatar-img"
             style={{
               width: 520,
               height: "auto",
@@ -978,6 +1145,7 @@ function HeroNav({ visible, activeSection, onNavClick, cvUrl }) {
 
   return (
     <header
+      className="hero-nav-header"
       style={{
         position: "absolute",
         top: 0,
@@ -1231,7 +1399,6 @@ function AboutSection() {
     return () => obs.disconnect();
   }, []);
 
-  // Replaced "My Journey" with "What I Bring" — a value-focused tab
   const valueProps = [
     {
       icon: (
@@ -1313,7 +1480,6 @@ function AboutSection() {
     },
   ];
 
-  // Replaced strength cards with clearer, sharper content
   const strengths = [
     {
       icon: (
@@ -1378,6 +1544,7 @@ function AboutSection() {
     <section
       id="about"
       ref={sectionRef}
+      className="about-section"
       style={{
         background: BG,
         color: FG,
@@ -1387,7 +1554,6 @@ function AboutSection() {
         overflow: "hidden",
       }}
     >
-      {/* Ambient orbs */}
       {[
         { w: 500, h: 500, top: -100, right: -80, op: 0.1, dur: "9s" },
         { w: 340, h: 340, bottom: 60, left: -60, op: 0.07, dur: "12s" },
@@ -1409,7 +1575,6 @@ function AboutSection() {
           }}
         />
       ))}
-
       <div
         style={{
           maxWidth: 1080,
@@ -1444,6 +1609,7 @@ function AboutSection() {
             About me
           </div>
           <div
+            className="about-header-row"
             style={{
               display: "flex",
               alignItems: "flex-end",
@@ -1452,6 +1618,7 @@ function AboutSection() {
             }}
           >
             <div
+              className="about-name"
               style={{
                 fontFamily: "'Outfit',sans-serif",
                 fontSize: "clamp(52px,6vw,86px)",
@@ -1470,7 +1637,10 @@ function AboutSection() {
                 Soran
               </span>
             </div>
-            <div style={{ paddingBottom: 10, flex: "0 0 380px" }}>
+            <div
+              className="about-bio-flex"
+              style={{ paddingBottom: 10, flex: "0 0 380px" }}
+            >
               <p style={{ fontSize: 14.5, lineHeight: 1.85, color: "#907060" }}>
                 <strong style={{ color: "#d4a080", fontWeight: 500 }}>
                   AI Developer
@@ -1482,9 +1652,9 @@ function AboutSection() {
           </div>
         </div>
 
-        {/* Two-column: Story + What I Bring */}
+        {/* Two-column */}
         <div
-          className="ab-animate"
+          className="ab-animate about-two-col"
           style={{
             display: "grid",
             gridTemplateColumns: "1.1fr 0.9fr",
@@ -1492,7 +1662,6 @@ function AboutSection() {
             marginBottom: 20,
           }}
         >
-          {/* Story / Bio card */}
           <div
             className="ab-info-card"
             style={{
@@ -1601,7 +1770,6 @@ function AboutSection() {
             </div>
           </div>
 
-          {/* What I Bring card — replaces My Journey */}
           <div
             className="ab-info-card"
             style={{
@@ -1692,9 +1860,9 @@ function AboutSection() {
           </div>
         </div>
 
-        {/* Strengths row — clearer content */}
+        {/* Strengths */}
         <div
-          className="ab-animate"
+          className="ab-animate about-strengths-grid"
           style={{
             display: "grid",
             gridTemplateColumns: "1fr 1fr 1fr",
@@ -1763,7 +1931,7 @@ function AboutSection() {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   SKILLS SECTION — Real icons, sharp copy
+   SKILLS SECTION
 ═══════════════════════════════════════════════════════════════════════════ */
 const SKILL_GROUPS = [
   {
@@ -2078,7 +2246,6 @@ function SkillChip({ skill, color, delay = 0 }) {
   }, []);
 
   const { Icon } = skill;
-
   return (
     <div
       ref={ref}
@@ -2135,6 +2302,7 @@ function SkillsSection() {
   return (
     <section
       id="skills"
+      className="skills-section"
       style={{
         background: "#160b00",
         color: "#f5f0e8",
@@ -2162,6 +2330,7 @@ function SkillsSection() {
       >
         {/* Header */}
         <div
+          className="skills-header-row"
           style={{
             display: "flex",
             alignItems: "flex-end",
@@ -2195,6 +2364,7 @@ function SkillsSection() {
               Tech Stack
             </div>
             <div
+              className="skills-title"
               style={{
                 fontFamily: "'Outfit',sans-serif",
                 fontSize: "clamp(44px,5.5vw,72px)",
@@ -2209,7 +2379,7 @@ function SkillsSection() {
               </div>
             </div>
           </div>
-          <div style={{ flex: "0 0 380px" }}>
+          <div className="skills-header-desc" style={{ flex: "0 0 380px" }}>
             <p style={{ fontSize: 14.5, color: "#907060", lineHeight: 1.85 }}>
               Focused on{" "}
               <strong style={{ color: "#d4a080", fontWeight: 500 }}>
@@ -2221,8 +2391,9 @@ function SkillsSection() {
           </div>
         </div>
 
-        {/* Tab selector */}
+        {/* Tabs */}
         <div
+          className="skills-tab-bar"
           style={{
             display: "flex",
             gap: 10,
@@ -2252,6 +2423,7 @@ function SkillsSection() {
                   cursor: "pointer",
                   transition: "all .22s ease",
                   boxShadow: isActive ? `0 4px 20px ${g.color}28` : "none",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <span style={{ display: "flex", alignItems: "center" }}>
@@ -2266,9 +2438,10 @@ function SkillsSection() {
         {/* Active group */}
         <div key={activeGroup} style={{ animation: "cardFlip .35s ease both" }}>
           <div
+            className="skills-active-grid"
             style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}
           >
-            {/* Left: detail */}
+            {/* Left */}
             <div
               style={{
                 background: "rgba(255,255,255,.02)",
@@ -2329,6 +2502,7 @@ function SkillsSection() {
                 </div>
               </div>
               <div
+                className="skills-chips-grid"
                 style={{
                   display: "grid",
                   gridTemplateColumns: "1fr 1fr",
@@ -2346,8 +2520,11 @@ function SkillsSection() {
               </div>
             </div>
 
-            {/* Right: other groups */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Right */}
+            <div
+              className="skills-inactive-col"
+              style={{ display: "flex", flexDirection: "column", gap: 12 }}
+            >
               {SKILL_GROUPS.filter((g) => g.id !== activeGroup).map((g) => (
                 <div
                   key={g.id}
@@ -2461,7 +2638,6 @@ function SkillsSection() {
                   </div>
                 </div>
               ))}
-
               {/* DevOps mini card */}
               <div
                 style={{
@@ -2553,7 +2729,23 @@ const PROJECTS = [
     accentColor: "#34D399",
     tags: ["Full Stack", "AI", "NLP"],
     stack: "MERN · FastAPI · NLP · Sentiment Analysis · JWT",
-    desc: "Full-stack Ayurveda therapy booking platform with role-based access, automated scheduling, and AI-powered sentiment analysis classifying feedback as positive, neutral, or negative.",
+    desc: (
+      <>
+        Full-stack Ayurveda therapy booking platform with{" "}
+        <span style={{ color: "#34D399", fontWeight: 700 }}>
+          role-based access
+        </span>
+        , automated scheduling, and an{" "}
+        <span style={{ color: "#34D399", fontWeight: 700 }}>
+          AI-powered NLP
+        </span>{" "}
+        layer performing{" "}
+        <span style={{ color: "#34D399", fontWeight: 700 }}>
+          sentiment analysis
+        </span>{" "}
+        to classify user feedback as positive, neutral, or negative.
+      </>
+    ),
     live: "https://ayur-sutra-coral.vercel.app/",
     github: "https://github.com/adityasoran0698",
     status: "Live",
@@ -2565,29 +2757,97 @@ const PROJECTS = [
     tags: ["Medical AI", "RAG", "Agentic AI", "OpenAI"],
     stack:
       "Python · LangChain · gpt-4o-mini · OpenAI Embeddings · FastAPI · React",
-    desc: "AI Medical Research Assistant that queries PubMed, OpenAlex & ClinicalTrials.gov in parallel, ranks 50–300 results using OpenAI embeddings, and delivers source-backed answers via gpt model with multi-turn memory.",
+    desc: (
+      <>
+        AI Medical Research Assistant with an{" "}
+        <span style={{ color: "#2E86AB", fontWeight: 700 }}>Agentic AI</span>{" "}
+        core that queries PubMed, OpenAlex & ClinicalTrials.gov in parallel.
+        Built a{" "}
+        <span style={{ color: "#2E86AB", fontWeight: 700 }}>RAG pipeline</span>{" "}
+        ranking 50–300 results via{" "}
+        <span style={{ color: "#2E86AB", fontWeight: 700 }}>
+          OpenAI Embeddings
+        </span>{" "}
+        to deliver source-backed, grounded answers with{" "}
+        <span style={{ color: "#2E86AB", fontWeight: 700 }}>
+          multi-turn memory
+        </span>
+        .
+      </>
+    ),
     live: "https://deployed-curalink.vercel.app/",
     github: "https://github.com/adityasoran0698/CuraLink",
     status: "Live",
   },
   {
     number: "03",
+    title: "VibeAI",
+    accentColor: "#FBBF24",
+    tags: ["LangGraph", "OpenAI", "SQLite"],
+    stack: "Python · LangGraph · OpenAI API · FastAPI · React.js · SQLite",
+    desc: (
+      <>
+        An AI Companion built on a{" "}
+        <span style={{ color: "#FBBF24", fontWeight: 700 }}>LangGraph</span>{" "}
+        stateful graph with{" "}
+        <span style={{ color: "#FBBF24", fontWeight: 700 }}>
+          persistent SQLite memory
+        </span>{" "}
+        — resume any past conversation from the sidebar, zero context loss.
+        Streams real-time token responses via{" "}
+        <span style={{ color: "#FBBF24", fontWeight: 700 }}>FastAPI</span> +{" "}
+        <span style={{ color: "#FBBF24", fontWeight: 700 }}>React</span> for a
+        seamless chat experience.
+      </>
+    ),
+    live: "https://chat-bot-langgraph.vercel.app/",
+    github: "https://github.com/adityasoran0698/VibeAI",
+    status: "Live",
+  },
+  {
+    number: "04",
     title: "YouTube Chatbot",
     accentColor: "#f26522",
     tags: ["RAG", "LangChain", "OpenAI", "Vector DB"],
     stack:
       "Python · LangChain · Chroma · FastAPI · OpenAI Embeddings · React.js",
-    desc: "End-to-end RAG pipeline ingesting YouTube transcripts, storing in ChromaDB for semantic retrieval, serving context-aware answers via a real-time React chat interface.",
+    desc: (
+      <>
+        Paste any YouTube URL and instantly chat with the video. Built an
+        end-to-end{" "}
+        <span style={{ color: "#f26522", fontWeight: 700 }}>RAG pipeline</span>{" "}
+        that ingests transcripts, stores them in a{" "}
+        <span style={{ color: "#f26522", fontWeight: 700 }}>
+          ChromaDB vector store
+        </span>{" "}
+        for semantic retrieval, and serves context-aware answers via{" "}
+        <span style={{ color: "#f26522", fontWeight: 700 }}>GPT-4o</span> +{" "}
+        <span style={{ color: "#f26522", fontWeight: 700 }}>LangChain.</span>{" "}
+        Supports Hindi & multilingual videos.
+      </>
+    ),
     github: "https://github.com/adityasoran0698",
     status: "GitHub",
   },
   {
-    number: "04",
+    number: "05",
     title: "AI Research Analyser",
     accentColor: "#818CF8",
     tags: ["Generative AI", "LangChain", "FastAPI"],
     stack: "React · Tailwind CSS · FastAPI · LangChain · OpenAI API",
-    desc: "Enter any research paper title, pick an explanation style (Beginner / Technical / Code-Oriented / Mathematical) and get a structured LLM-generated breakdown instantly.",
+    desc: (
+      <>
+        Enter any research paper title, choose an explanation style — Beginner,
+        Technical, Code-Oriented, or Mathematical — and get a structured{" "}
+        <span style={{ color: "#818CF8", fontWeight: 700 }}>
+          LLM-generated breakdown
+        </span>{" "}
+        instantly. Powered by a{" "}
+        <span style={{ color: "#818CF8", fontWeight: 700 }}>LangChain</span> +{" "}
+        <span style={{ color: "#818CF8", fontWeight: 700 }}>OpenAI API</span>{" "}
+        backend with selectable summary lengths — Short, Medium, or Detailed.
+      </>
+    ),
     github: "https://github.com/adityasoran0698/ai-research-analyser",
     status: "GitHub",
   },
@@ -2657,7 +2917,6 @@ function ProjectCard({ project }) {
           pointerEvents: "none",
         }}
       />
-
       <div
         style={{
           display: "flex",
@@ -2762,6 +3021,7 @@ function ProjectCard({ project }) {
           color: "#907060",
           lineHeight: 1.75,
           marginBottom: 20,
+          textAlign: "justify",
         }}
       >
         {desc}
@@ -2834,15 +3094,11 @@ function ProjectCard({ project }) {
 
 function ProjectsSection() {
   const CARDS_PER_VIEW = 3;
-
   const chunks = [];
-  for (let i = 0; i < PROJECTS.length; i += CARDS_PER_VIEW) {
+  for (let i = 0; i < PROJECTS.length; i += CARDS_PER_VIEW)
     chunks.push(PROJECTS.slice(i, i + CARDS_PER_VIEW));
-  }
-
   const totalWindows = chunks.length;
   const canSlide = totalWindows > 1;
-
   const [windowIndex, setWindowIndex] = useState(0);
   const [displayIndex, setDisplayIndex] = useState(0);
   const [phase, setPhase] = useState("idle");
@@ -2855,10 +3111,8 @@ function ProjectsSection() {
         ? Math.min(windowIndex + 1, totalWindows - 1)
         : Math.max(windowIndex - 1, 0);
     if (next === windowIndex) return;
-
     setSlideDir(dir === "next" ? "left" : "right");
     setPhase("exit");
-
     setTimeout(() => {
       setDisplayIndex(next);
       setWindowIndex(next);
@@ -2872,6 +3126,7 @@ function ProjectsSection() {
   return (
     <section
       id="projects"
+      className="projects-section"
       style={{
         padding: "96px 52px",
         background: "#160b00",
@@ -2890,7 +3145,6 @@ function ProjectsSection() {
         }}
       />
       <div style={{ maxWidth: 1080, margin: "0 auto", position: "relative" }}>
-        {/* Header — no arrows here anymore */}
         <div style={{ marginBottom: 48 }}>
           <p
             style={{
@@ -2929,9 +3183,9 @@ function ProjectsSection() {
           </h2>
         </div>
 
-        {/* Sliding track */}
         <div style={{ overflow: "hidden", position: "relative" }}>
           <div
+            className="projects-cards-grid"
             style={{
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
@@ -2953,7 +3207,6 @@ function ProjectsSection() {
           </div>
         </div>
 
-        {/* Bottom controls — centered below cards */}
         {canSlide && (
           <div
             style={{
@@ -2964,7 +3217,6 @@ function ProjectsSection() {
               marginTop: 40,
             }}
           >
-            {/* Prev button */}
             <button
               onClick={() => doSlide("prev")}
               disabled={windowIndex === 0 || phase !== "idle"}
@@ -3007,8 +3259,6 @@ function ProjectsSection() {
             >
               ←
             </button>
-
-            {/* Dots + counter pill */}
             <div
               style={{
                 display: "flex",
@@ -3021,7 +3271,6 @@ function ProjectsSection() {
                 backdropFilter: "blur(12px)",
               }}
             >
-              {/* Dots */}
               <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 {Array.from({ length: totalWindows }).map((_, i) => (
                   <button
@@ -3052,8 +3301,6 @@ function ProjectsSection() {
                   />
                 ))}
               </div>
-
-              {/* Divider */}
               <div
                 style={{
                   width: 1,
@@ -3062,8 +3309,6 @@ function ProjectsSection() {
                   borderRadius: 1,
                 }}
               />
-
-              {/* Counter */}
               <span
                 style={{
                   fontFamily: "'Outfit',sans-serif",
@@ -3079,8 +3324,6 @@ function ProjectsSection() {
                 {totalWindows}
               </span>
             </div>
-
-            {/* Next button */}
             <button
               onClick={() => doSlide("next")}
               disabled={windowIndex >= totalWindows - 1 || phase !== "idle"}
@@ -3135,22 +3378,10 @@ function ProjectsSection() {
       </div>
 
       <style>{`
-        @keyframes slideOutLeft {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(-40px); }
-        }
-        @keyframes slideOutRight {
-          from { opacity: 1; transform: translateX(0); }
-          to   { opacity: 0; transform: translateX(40px); }
-        }
-        @keyframes slideInRight {
-          from { opacity: 0; transform: translateX(48px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes slideInLeft {
-          from { opacity: 0; transform: translateX(-48px); }
-          to   { opacity: 1; transform: translateX(0); }
-        }
+        @keyframes slideOutLeft  { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(-40px)} }
+        @keyframes slideOutRight { from{opacity:1;transform:translateX(0)} to{opacity:0;transform:translateX(40px)} }
+        @keyframes slideInRight  { from{opacity:0;transform:translateX(48px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInLeft   { from{opacity:0;transform:translateX(-48px)} to{opacity:1;transform:translateX(0)} }
       `}</style>
     </section>
   );
@@ -3216,6 +3447,7 @@ export default function Portfolio() {
         <section
           id="home"
           ref={heroRef}
+          className="hero-section"
           style={{
             minHeight: "100vh",
             display: "flex",
@@ -3238,6 +3470,7 @@ export default function Portfolio() {
             }}
           />
           <div
+            className="hero-lightning-top"
             style={{
               position: "absolute",
               top: "6%",
@@ -3251,6 +3484,7 @@ export default function Portfolio() {
             <Icons.Lightning size={90} color="#f26522" />
           </div>
           <div
+            className="hero-lightning-bottom"
             style={{
               position: "absolute",
               bottom: "10%",
@@ -3271,6 +3505,7 @@ export default function Portfolio() {
           ].map((d, i) => (
             <div
               key={i}
+              className="hero-dot"
               style={{
                 position: "absolute",
                 top: d.tr,
@@ -3286,7 +3521,9 @@ export default function Portfolio() {
               }}
             />
           ))}
+
           <div
+            className="hero-inner"
             style={{
               display: "flex",
               alignItems: "center",
@@ -3296,7 +3533,10 @@ export default function Portfolio() {
               margin: "0 auto",
             }}
           >
-            <div style={{ flex: "0 0 55%", minWidth: 0 }}>
+            <div
+              className="hero-text-col"
+              style={{ flex: "0 0 55%", minWidth: 0 }}
+            >
               <p
                 className="fu fu1"
                 style={{
@@ -3312,7 +3552,7 @@ export default function Portfolio() {
                 </span>
               </p>
               <h1
-                className="fu fu2"
+                className="fu fu2 hero-title"
                 style={{
                   fontFamily: "Plus Jakarta Sans,sans-serif",
                   fontSize: "clamp(38px,4.4vw,64px)",
@@ -3323,8 +3563,7 @@ export default function Portfolio() {
                   marginBottom: 14,
                 }}
               >
-                AI {/* <br /> */}
-                <span style={{ color: "#f26522" }}>Developer</span>
+                AI <span style={{ color: "#f26522" }}>Developer</span>
               </h1>
               <div
                 className="fu fu2"
@@ -3337,7 +3576,7 @@ export default function Portfolio() {
                 }}
               />
               <p
-                className="fu fu3"
+                className="fu fu3 hero-subtitle"
                 style={{
                   fontSize: 16.5,
                   color: "#907060",
@@ -3351,7 +3590,7 @@ export default function Portfolio() {
                 full-stack products.
               </p>
               <div
-                className="fu fu4"
+                className="fu fu4 hero-cta-row"
                 style={{ display: "flex", gap: 14, alignItems: "center" }}
               >
                 <a
@@ -3406,6 +3645,7 @@ export default function Portfolio() {
               </div>
             </div>
             <div
+              className="hero-avatar-col"
               style={{ flex: "1 1 auto", height: 520, position: "relative" }}
             >
               <Avatar3D photoUrl={photoUrl} />
@@ -3420,6 +3660,7 @@ export default function Portfolio() {
         {/* CONNECT */}
         <section
           id="connect"
+          className="connect-section"
           style={{
             padding: "96px 52px 112px",
             textAlign: "center",
@@ -3465,6 +3706,7 @@ export default function Portfolio() {
               let's connect.
             </p>
             <div
+              className="connect-cta-row"
               style={{
                 display: "flex",
                 gap: 14,
@@ -3551,6 +3793,7 @@ export default function Portfolio() {
 
         {/* FOOTER */}
         <div
+          className="footer-bar"
           style={{
             borderTop: "1px solid rgba(242,101,34,.1)",
             padding: "20px 52px",
